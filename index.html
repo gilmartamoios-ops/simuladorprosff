@@ -46,9 +46,8 @@ Consumo mensal
 placeholder="Digite ou escolha abaixo"
 onclick="this.select()"
 class="text-center bg-black border border-gray-700 rounded-xl p-2 w-full text-green-400 font-bold"
-oninput="formatarMoeda(this); simular()">
+onblur="formatarMoeda(this); simular()">
 
-<!-- 🔥 BOTÕES RÁPIDOS -->
 <div class="flex gap-2 mt-3 justify-center">
 <button onclick="setConsumo(200)" class="btn-back px-3 py-1 text-xs">200</button>
 <button onclick="setConsumo(300)" class="btn-back px-3 py-1 text-xs">300</button>
@@ -68,7 +67,6 @@ oninput="simular()">
 </div>
 
 </div>
-
 </div>
 <div class="prosff-card rounded-3xl p-6 mb-6 text-center">
 <p class="text-xs text-gray-400">
@@ -90,6 +88,8 @@ Etapa <span id="mesAtual">1</span> de 12
 </div>
 
 <div id="lista-etapas"></div>
+
+</div> <!-- 🔥 FECHAMENTO CORRIGIDO -->
 
 <script>
  function getParams(){
@@ -160,7 +160,11 @@ let VALOR_FIXO = document.getElementById('consumo').value
 .replace(",",".")
 .trim();
 
-VALOR_FIXO = parseFloat(VALOR_FIXO) || 300;
+VALOR_FIXO = parseFloat(VALOR_FIXO);
+
+if(!VALOR_FIXO || isNaN(VALOR_FIXO)){
+VALOR_FIXO = 0;
+}
 
 let DUPLICACAO = parseFloat(document.getElementById('duplicacao').value) || 3;
 
