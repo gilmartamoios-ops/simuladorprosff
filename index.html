@@ -6,6 +6,7 @@
 <title>C3 | Simulador</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
 
@@ -14,7 +15,6 @@ body { font-family: 'Montserrat', sans-serif; background-color: #080808; color: 
 .prosff-card { background: #121212; border: 1px solid #222; }
 .gold-text { color: #ffcc00; }
 .green-text { color: #00ff88; }
-input[type=range] { accent-color: #00ff88; }
 </style>
 </head>
 
@@ -69,13 +69,13 @@ oninput="simular()">
 
 </div>
 </div>
+
 <div class="prosff-card rounded-3xl p-6 mb-6 text-center">
 <p class="text-xs text-gray-400">
 No C3 o crescimento acontece pela conexão de novos membros.<br><br>
 <strong class="text-white">Não é sobre velocidade. É sobre consistência.</strong>
 </p>
 </div>
-
 <div class="flex items-center justify-between mb-4">
 
 <button onclick="voltar()" class="btn-back px-4 py-2 rounded-xl">←</button>
@@ -90,24 +90,16 @@ Etapa <span id="mesAtual">1</span> de 12
 
 <div id="lista-etapas"></div>
 
+<!-- GRÁFICO -->
+<div class="prosff-card rounded-3xl p-4 mt-6">
+<canvas id="grafico"></canvas>
 </div>
 
+</div>
 <script>
- function getParams(){
-const params = new URLSearchParams(window.location.search);
-return {
-numero: params.get("wpp") || "5522999231211",
-ref: params.get("ref") || "indicação direta"
-};
-}
-
-function voltarAPN(){
-let {numero, ref} = getParams();
-let url = "https://apndigital.vercel.app/?wpp="+numero+"&ref="+ref+"&step=12";
-window.location.href = url;
-}
 
 let mesAtual = 1;
+let chart;
 
 function avancar(){
 if(mesAtual < 12){
@@ -133,16 +125,15 @@ return "Crescimento consistente";
 
 function getAcao(e){
 if(e===1) return "Conecte 3 pessoas com o mesmo objetivo";
-if(e===2) return "Apoie seus membros a se desenvolverem";
+if(e===2) return "Apoie seus membros";
 if(e===3) return "Fortaleça sua comunidade";
 return "Desenvolva novos líderes";
 }
 
 function simular(){
 
-try{
-
 let VALOR_FIXO = parseFloat(document.getElementById('consumo').value);
+if(isNaN(VALOR_FIXO)) VALOR_FIXO = 300;
 
 let DUPLICACAO = parseFloat(document.getElementById('duplicacao').value) || 3;
 
@@ -154,15 +145,21 @@ container.innerHTML = '';
 let rede = 0;
 let ptsAnterior = 0;
 
+let labels = [];
+let ganhos = [];
+
+const tabelaUnilevel = [
+0.05,0.05,0.045,0.01,0.0275,0.02,
+0.005,0.005,0.0025,0.001,0.0005,
+0.0005,0.0003,0.0002
+];
+
 const tiers = [
 { pts: 950, pin: 100, vme: 0.5 },
 { pts: 2450, pin: 200, vme: 0.5 },
 { pts: 7250, pin: 700, vme: 0.4 },
 { pts: 14750, pin: 1300, vme: 0.4 },
-{ pts: 27500, pin: 4000, vme: 0.4 },
-{ pts: 60000, pin: 12000, vme: 0.4 },
-{ pts: 122500, pin: 24000, vme: 0.4 },
-{ pts: 247500, pin: 34000, vme: 0.35 }
+{ pts: 27500, pin: 4000, vme: 0.4 }
 ];
 
 for(let e=1; e<=mesAtual; e++){
@@ -174,12 +171,24 @@ let faturamento = rede * VALOR_FIXO;
 let ptsMensal = faturamento / 3;
 
 let unilevel = 0;
-for(let g=1; g<=e; g++){
-let perc = (g<=2)?0.05:(g===3?0.09:0.04);
+
+for(let g=1; g<=e && g<=14; g++){
+let perc = tabelaUnilevel[g-1] || 0;
 unilevel += Math.pow(DUPLICACAO,g)*VALOR_FIXO*perc;
 }
 
-let bonus3D = (ptsMensal > ptsAnterior && ptsMensal <= 27500)? ptsAnterior:0;
+// BONUS 30D CORRETO
+let bonus3D = 0;
+
+if(e % 2 === 0){
+let menor = Math.min(ptsMensal, ptsAnterior);
+bonus3D = menor;
+}
+
+if(ptsMensal > 27500){
+bonus3D = 0;
+}
+
 let ptsCarreira = ptsMensal + bonus3D;
 
 let pinBonus = 0;
@@ -193,6 +202,9 @@ pinBonus = t.pin;
 }
 
 let total = unilevel + pinBonus;
+
+labels.push("E"+e);
+ganhos.push(Math.floor(total));
 
 ptsAnterior = ptsMensal;
 
@@ -215,22 +227,28 @@ R$ ${Math.floor(total).toLocaleString('pt-BR')}
 ${getAcao(e)}
 </p>
 
-<button onclick="voltarAPN()"
-class="bg-green-500 text-black font-bold px-4 py-3 rounded-xl inline-block w-full">
-
-Voltar para apresentação
-
-</button>
-
 </div>
 `;
 }
-
 }
 
-}catch(e){
-console.log(e);
+// GRÁFICO
+if(chart){
+chart.destroy();
 }
+
+chart = new Chart(document.getElementById('grafico'), {
+type: 'line',
+data: {
+labels: labels,
+datasets: [{
+label: 'Evolução de Ganhos',
+data: ganhos,
+borderColor: '#00ff88',
+tension: 0.3
+}]
+}
+});
 
 }
 
