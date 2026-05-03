@@ -42,18 +42,19 @@ Simulador de construção de comunidade
 Consumo mensal
 </label>
 
-<input id="consumo" type="text" value="R$ 300,00"
-placeholder="Digite ou escolha abaixo"
-onclick="this.select()"
+<select id="consumo"
 class="text-center bg-black border border-gray-700 rounded-xl p-2 w-full text-green-400 font-bold"
-onblur="formatarMoeda(this); simular()">
+onchange="simular()">
 
-<div class="flex gap-2 mt-3 justify-center">
-<button onclick="setConsumo(200)" class="btn-back px-3 py-1 text-xs">200</button>
-<button onclick="setConsumo(300)" class="btn-back px-3 py-1 text-xs">300</button>
-<button onclick="setConsumo(500)" class="btn-back px-3 py-1 text-xs">500</button>
-</div>
+<option value="300">R$ 300,00</option>
+<option value="350">R$ 350,00</option>
+<option value="400">R$ 400,00</option>
+<option value="450">R$ 450,00</option>
+<option value="500">R$ 500,00</option>
+<option value="550">R$ 550,00</option>
+<option value="600">R$ 600,00</option>
 
+</select>
 </div>
 
 <div>
@@ -89,7 +90,7 @@ Etapa <span id="mesAtual">1</span> de 12
 
 <div id="lista-etapas"></div>
 
-</div> <!-- 🔥 FECHAMENTO CORRIGIDO -->
+</div>
 
 <script>
  function getParams(){
@@ -104,19 +105,6 @@ function voltarAPN(){
 let {numero, ref} = getParams();
 let url = "https://apndigital.vercel.app/?wpp="+numero+"&ref="+ref+"&step=12";
 window.location.href = url;
-}
-
-function setConsumo(valor){
-document.getElementById('consumo').value = "R$ " + valor.toFixed(2).replace(".", ",");
-simular();
-}
-
-function formatarMoeda(campo){
-let valor = campo.value.replace(/\D/g,'');
-valor = (parseFloat(valor)/100).toFixed(2) + '';
-valor = valor.replace(".", ",");
-valor = valor.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-campo.value = "R$ " + valor;
 }
 
 let mesAtual = 1;
@@ -154,17 +142,7 @@ function simular(){
 
 try{
 
-let VALOR_FIXO = document.getElementById('consumo').value
-.replace("R$","")
-.replace(/\./g,"")
-.replace(",",".")
-.trim();
-
-VALOR_FIXO = parseFloat(VALOR_FIXO);
-
-if(!VALOR_FIXO || isNaN(VALOR_FIXO)){
-VALOR_FIXO = 0;
-}
+let VALOR_FIXO = parseFloat(document.getElementById('consumo').value);
 
 let DUPLICACAO = parseFloat(document.getElementById('duplicacao').value) || 3;
 
