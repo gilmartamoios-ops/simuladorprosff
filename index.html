@@ -90,7 +90,6 @@ Etapa <span id="mesAtual">1</span> de 12
 
 <div id="lista-etapas"></div>
 
-<!-- GRÁFICO -->
 <div class="prosff-card rounded-3xl p-4 mt-6">
 <canvas id="grafico"></canvas>
 </div>
@@ -148,18 +147,21 @@ let ptsAnterior = 0;
 let labels = [];
 let ganhos = [];
 
+// 🔥 UNILEVEL AJUSTADO
 const tabelaUnilevel = [
-0.05,0.05,0.045,0.01,0.0275,0.02,
-0.005,0.005,0.0025,0.001,0.0005,
-0.0005,0.0003,0.0002
+0.05,0.05,0.09,0.05,0.04,0.04,
+0.03,0.03,0.02,0.02,0.01,0.01,0.005,0.005
 ];
 
+// 🔥 PIN COMPLETO (sem travar cedo)
 const tiers = [
 { pts: 950, pin: 100, vme: 0.5 },
 { pts: 2450, pin: 200, vme: 0.5 },
 { pts: 7250, pin: 700, vme: 0.4 },
 { pts: 14750, pin: 1300, vme: 0.4 },
-{ pts: 27500, pin: 4000, vme: 0.4 }
+{ pts: 27500, pin: 4000, vme: 0.4 },
+{ pts: 60000, pin: 12000, vme: 0.4 },
+{ pts: 122500, pin: 24000, vme: 0.4 }
 ];
 
 for(let e=1; e<=mesAtual; e++){
@@ -170,6 +172,7 @@ rede += novos;
 let faturamento = rede * VALOR_FIXO;
 let ptsMensal = faturamento / 3;
 
+// 🔥 UNILEVEL
 let unilevel = 0;
 
 for(let g=1; g<=e && g<=14; g++){
@@ -177,12 +180,13 @@ let perc = tabelaUnilevel[g-1] || 0;
 unilevel += Math.pow(DUPLICACAO,g)*VALOR_FIXO*perc;
 }
 
-// BONUS 30D CORRETO
+// 🔥 30D AJUSTADO (crescimento real)
 let bonus3D = 0;
 
-if(e % 2 === 0){
-let menor = Math.min(ptsMensal, ptsAnterior);
-bonus3D = menor;
+let crescimento = ptsMensal - ptsAnterior;
+
+if(e % 2 === 0 && crescimento > 0){
+bonus3D = crescimento;
 }
 
 if(ptsMensal > 27500){
@@ -191,6 +195,7 @@ bonus3D = 0;
 
 let ptsCarreira = ptsMensal + bonus3D;
 
+// 🔥 PIN
 let pinBonus = 0;
 let ptsPorLinha = ptsCarreira / DUPLICACAO;
 
@@ -232,7 +237,7 @@ ${getAcao(e)}
 }
 }
 
-// GRÁFICO
+// 🔥 GRÁFICO
 if(chart){
 chart.destroy();
 }
