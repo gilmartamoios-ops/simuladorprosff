@@ -33,11 +33,11 @@ Simulador de construção de comunidade
 1 membro conectando 3 novos membros
 </p>
 </header>
+
 <div class="prosff-card rounded-3xl p-4 mb-6 border-dashed border-green-500/30">
 
 <div class="grid grid-cols-2 gap-3">
-
-<div>
+  <div>
 <label class="text-[10px] text-gray-500 uppercase block mb-1 text-center">
 Consumo mensal
 </label>
@@ -76,6 +76,7 @@ No C3 o crescimento acontece pela conexão de novos membros.<br><br>
 <strong class="text-white">Não é sobre velocidade. É sobre consistência.</strong>
 </p>
 </div>
+
 <div class="flex items-center justify-between mb-4">
 
 <button onclick="voltar()" class="btn-back px-4 py-2 rounded-xl">←</button>
@@ -114,12 +115,14 @@ simular();
 }
 }
 
+// 🔥 INTERPRETAÇÃO HUMANA (AQUI ESTÁ O OURO)
 function getStatus(e){
 if(e===1) return "Início da construção";
-if(e===2) return "Primeiras conexões";
-if(e===3) return "Base em formação";
-if(e===4) return "Comunidade estruturada";
-return "Crescimento consistente";
+if(e===2) return "Já começa a compensar seu consumo";
+if(e===3) return "Alivia despesas do mês";
+if(e===4) return "Impacto real no orçamento";
+if(e===5) return "Pode substituir uma renda extra";
+return "Renda acima da média";
 }
 
 function getAcao(e){
@@ -147,13 +150,11 @@ let ptsAnterior = 0;
 let labels = [];
 let ganhos = [];
 
-// 🔥 UNILEVEL AJUSTADO
 const tabelaUnilevel = [
 0.05,0.05,0.09,0.05,0.04,0.04,
 0.03,0.03,0.02,0.02,0.01,0.01,0.005,0.005
 ];
 
-// 🔥 PIN COMPLETO (sem travar cedo)
 const tiers = [
 { pts: 950, pin: 100, vme: 0.5 },
 { pts: 2450, pin: 200, vme: 0.5 },
@@ -163,8 +164,7 @@ const tiers = [
 { pts: 60000, pin: 12000, vme: 0.4 },
 { pts: 122500, pin: 24000, vme: 0.4 }
 ];
-
-for(let e=1; e<=mesAtual; e++){
+  for(let e=1; e<=mesAtual; e++){
 
 let novos = Math.pow(DUPLICACAO,e);
 rede += novos;
@@ -172,17 +172,15 @@ rede += novos;
 let faturamento = rede * VALOR_FIXO;
 let ptsMensal = faturamento / 3;
 
-// 🔥 UNILEVEL
+// UNILEVEL
 let unilevel = 0;
-
 for(let g=1; g<=e && g<=14; g++){
 let perc = tabelaUnilevel[g-1] || 0;
 unilevel += Math.pow(DUPLICACAO,g)*VALOR_FIXO*perc;
 }
 
-// 🔥 30D AJUSTADO (crescimento real)
+// 🔥 30D CORRETO
 let bonus3D = 0;
-
 let crescimento = ptsMensal - ptsAnterior;
 
 if(e % 2 === 0 && crescimento > 0){
@@ -195,7 +193,7 @@ bonus3D = 0;
 
 let ptsCarreira = ptsMensal + bonus3D;
 
-// 🔥 PIN
+// PIN
 let pinBonus = 0;
 let ptsPorLinha = ptsCarreira / DUPLICACAO;
 
@@ -224,7 +222,7 @@ container.innerHTML = `
 
 <p class="text-xs text-green-400 mb-4">${getStatus(e)}</p>
 
-<p class="text-2xl font-black green-text mb-4">
+<p class="text-2xl font-black green-text mb-2">
 R$ ${Math.floor(total).toLocaleString('pt-BR')}
 </p>
 
@@ -232,12 +230,16 @@ R$ ${Math.floor(total).toLocaleString('pt-BR')}
 ${getAcao(e)}
 </p>
 
+<p class="text-xs text-gray-500">
+Essa construção acontece a partir do seu consumo e da comunidade conectada.
+</p>
+
 </div>
 `;
 }
 }
 
-// 🔥 GRÁFICO
+// GRÁFICO
 if(chart){
 chart.destroy();
 }
