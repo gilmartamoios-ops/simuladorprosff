@@ -43,8 +43,18 @@ Consumo mensal
 </label>
 
 <input id="consumo" type="text" value="R$ 300,00"
+placeholder="Digite ou escolha abaixo"
+onclick="this.select()"
 class="text-center bg-black border border-gray-700 rounded-xl p-2 w-full text-green-400 font-bold"
 oninput="formatarMoeda(this); simular()">
+
+<!-- 🔥 BOTÕES RÁPIDOS -->
+<div class="flex gap-2 mt-3 justify-center">
+<button onclick="setConsumo(200)" class="btn-back px-3 py-1 text-xs">200</button>
+<button onclick="setConsumo(300)" class="btn-back px-3 py-1 text-xs">300</button>
+<button onclick="setConsumo(500)" class="btn-back px-3 py-1 text-xs">500</button>
+</div>
+
 </div>
 
 <div>
@@ -60,7 +70,6 @@ oninput="simular()">
 </div>
 
 </div>
-
 <div class="prosff-card rounded-3xl p-6 mb-6 text-center">
 <p class="text-xs text-gray-400">
 No C3 o crescimento acontece pela conexão de novos membros.<br><br>
@@ -81,9 +90,9 @@ Etapa <span id="mesAtual">1</span> de 12
 </div>
 
 <div id="lista-etapas"></div>
-<script>
 
-function getParams(){
+<script>
+ function getParams(){
 const params = new URLSearchParams(window.location.search);
 return {
 numero: params.get("wpp") || "5522999231211",
@@ -95,6 +104,11 @@ function voltarAPN(){
 let {numero, ref} = getParams();
 let url = "https://apndigital.vercel.app/?wpp="+numero+"&ref="+ref+"&step=12";
 window.location.href = url;
+}
+
+function setConsumo(valor){
+document.getElementById('consumo').value = "R$ " + valor.toFixed(2).replace(".", ",");
+simular();
 }
 
 function formatarMoeda(campo){
@@ -135,7 +149,8 @@ if(e===2) return "Apoie seus membros a se desenvolverem";
 if(e===3) return "Fortaleça sua comunidade";
 return "Desenvolva novos líderes";
 }
- function simular(){
+
+function simular(){
 
 try{
 
@@ -242,4 +257,4 @@ simular();
 </script>
 
 </body>
-</html> 
+</html>
