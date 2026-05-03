@@ -15,6 +15,7 @@ body { font-family: 'Montserrat', sans-serif; background-color: #080808; color: 
 .prosff-card { background: #121212; border: 1px solid #222; }
 .gold-text { color: #ffcc00; }
 .green-text { color: #00ff88; }
+.btn-back { background:#222;color:#aaa; }
 </style>
 </head>
 
@@ -78,7 +79,6 @@ No C3 o crescimento acontece pela conexão de novos membros.<br><br>
 </div>
 
 <div class="flex items-center justify-between mb-4">
-
 <button onclick="voltar()" class="btn-back px-4 py-2 rounded-xl">←</button>
 
 <p class="text-sm font-bold">
@@ -86,7 +86,6 @@ Etapa <span id="mesAtual">1</span> de 12
 </p>
 
 <button onclick="avancar()" class="btn-back px-4 py-2 rounded-xl">→</button>
-
 </div>
 
 <div id="lista-etapas"></div>
@@ -115,7 +114,6 @@ simular();
 }
 }
 
-// 🔥 INTERPRETAÇÃO HUMANA (AQUI ESTÁ O OURO)
 function getStatus(e){
 if(e===1) return "Início da construção";
 if(e===2) return "Já começa a compensar seu consumo";
@@ -132,11 +130,23 @@ if(e===3) return "Fortaleça sua comunidade";
 return "Desenvolva novos líderes";
 }
 
+function getParams(){
+const params = new URLSearchParams(window.location.search);
+return {
+numero: params.get("wpp") || "5522999231211",
+ref: params.get("ref") || "indicação direta"
+};
+}
+
+function voltarAPN(){
+let {numero, ref} = getParams();
+let url = "https://apndigital.vercel.app/?wpp="+numero+"&ref="+ref+"&step=12";
+window.location.href = url;
+}
+
 function simular(){
 
-let VALOR_FIXO = parseFloat(document.getElementById('consumo').value);
-if(isNaN(VALOR_FIXO)) VALOR_FIXO = 300;
-
+let VALOR_FIXO = parseFloat(document.getElementById('consumo').value) || 300;
 let DUPLICACAO = parseFloat(document.getElementById('duplicacao').value) || 3;
 
 document.getElementById('mesAtual').innerText = mesAtual;
@@ -164,7 +174,7 @@ const tiers = [
 { pts: 60000, pin: 12000, vme: 0.4 },
 { pts: 122500, pin: 24000, vme: 0.4 }
 ];
-  for(let e=1; e<=mesAtual; e++){
+for(let e=1; e<=mesAtual; e++){
 
 let novos = Math.pow(DUPLICACAO,e);
 rede += novos;
@@ -172,14 +182,13 @@ rede += novos;
 let faturamento = rede * VALOR_FIXO;
 let ptsMensal = faturamento / 3;
 
-// UNILEVEL
 let unilevel = 0;
 for(let g=1; g<=e && g<=14; g++){
 let perc = tabelaUnilevel[g-1] || 0;
 unilevel += Math.pow(DUPLICACAO,g)*VALOR_FIXO*perc;
 }
 
-// 🔥 30D CORRETO
+// 🔥 30D
 let bonus3D = 0;
 let crescimento = ptsMensal - ptsAnterior;
 
@@ -226,20 +235,30 @@ container.innerHTML = `
 R$ ${Math.floor(total).toLocaleString('pt-BR')}
 </p>
 
+<p class="text-xs text-gray-400 mb-3">
+Baseado em um consumo que você já teria no seu dia a dia.
+</p>
+
 <p class="text-xs text-gray-400 mb-4">
 ${getAcao(e)}
 </p>
 
-<p class="text-xs text-gray-500">
-Essa construção acontece a partir do seu consumo e da comunidade conectada.
+<p class="text-xs text-gray-500 mb-5">
+Não é sobre vender.<br>
+É sobre organizar algo que você já faz.
 </p>
+
+<button onclick="voltarAPN()"
+class="bg-green-500 text-black font-bold px-4 py-3 rounded-xl w-full">
+Voltar para apresentação
+</button>
 
 </div>
 `;
 }
 }
 
-// GRÁFICO
+// gráfico
 if(chart){
 chart.destroy();
 }
@@ -264,4 +283,4 @@ simular();
 </script>
 
 </body>
-</html>
+</html>  
