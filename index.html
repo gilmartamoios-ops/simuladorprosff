@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -125,7 +124,17 @@ box-shadow:
 0 12px 40px
 rgba(0,0,0,.28);
 
+/* NOVO */
+
+display:flex;
+flex-direction:column;
+
+height:92vh;
+
+overflow:hidden;
+
 }
+
 
 /* LOGO */
 
@@ -289,16 +298,14 @@ font-size:16px;
 
 margin-top:10px;
 
-max-height:42vh;
+max-height:48vh;
 
 overflow-y:auto;
 
-padding-right:6px;
-
-text-align:left;
+padding-bottom:120px;
 
 }
-
+ 
 .resultado::-webkit-scrollbar{
 width:6px;
 }
@@ -818,7 +825,7 @@ bonusPin;
 
 const imagemComunidade =
 
-`comunidade_${Math.min(
+`./img/comunidade_${Math.min(
 etapa,
 6
 )}.jpg`;
