@@ -1,280 +1,952 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>C3 | Simulador</title>
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+>
+
+<title>
+CRC | Simulador de Comunidade
+</title>
+
+<meta
+name="description"
+content="Simulador CRC de construção de comunidade e relacionamento de consumo."
+>
 
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
 
 <style>
-body { font-family: 'Montserrat', sans-serif; background-color: #080808; color: white; }
-.prosff-card { background: #121212; border: 1px solid #222; }
-.gold-text { color: #ffcc00; }
-.green-text { color: #00ff88; }
-.btn-back { background:#222;color:#aaa; }
+
+/* RESET */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html,
+body{
+
+width:100%;
+height:100%;
+
+font-family:Arial,sans-serif;
+
+background:#050505;
+color:white;
+
+overflow:hidden;
+
+}
+
+/* APP */
+
+.app{
+
+position:relative;
+width:100%;
+height:100dvh;
+
+overflow:hidden;
+
+}
+
+/* BACKGROUND */
+
+.bg{
+
+position:absolute;
+inset:0;
+
+width:100%;
+height:100%;
+
+object-fit:cover;
+object-position:center;
+
+filter:
+brightness(.45)
+contrast(1.04);
+
+transform:
+scale(1.04);
+
+}
+
+/* OVERLAY */
+
+.overlay{
+
+position:absolute;
+inset:0;
+
+background:
+linear-gradient(
+to top,
+rgba(0,0,0,.92),
+rgba(0,0,0,.35)
+);
+
+}
+
+/* CARD */
+
+.card{
+
+position:relative;
+z-index:2;
+
+width:100%;
+max-width:820px;
+
+background:
+rgba(0,0,0,.16);
+
+backdrop-filter:
+blur(16px);
+
+border:
+1px solid
+rgba(255,255,255,.08);
+
+border-radius:34px;
+
+padding:24px;
+
+box-shadow:
+0 12px 40px
+rgba(0,0,0,.28);
+
+}
+
+/* LOGO */
+
+.logo{
+
+position:absolute;
+
+bottom:20px;
+right:20px;
+
+width:44px;
+height:44px;
+
+border-radius:50%;
+
+object-fit:cover;
+
+opacity:.35;
+
+z-index:1;
+
+pointer-events:none;
+
+}
+
+/* TEXTO */
+
+.eyebrow{
+
+font-size:12px;
+
+letter-spacing:2px;
+text-transform:uppercase;
+
+color:
+rgba(255,255,255,.64);
+
+margin-bottom:18px;
+
+}
+
+.title{
+
+font-size:
+clamp(30px,5vw,52px);
+
+line-height:1.18;
+font-weight:300;
+
+margin-bottom:18px;
+
+}
+
+.subtitle{
+
+font-size:
+clamp(16px,2vw,22px);
+
+line-height:1.7;
+
+max-width:720px;
+
+color:
+rgba(255,255,255,.84);
+
+margin:auto;
+
+}
+
+/* BOTÃO */
+
+.btn{
+
+margin-top:28px;
+
+border:none;
+cursor:pointer;
+
+background:#00ff88;
+color:#07120d;
+
+padding:18px 34px;
+
+font-size:16px;
+font-weight:700;
+
+border-radius:999px;
+
+transition:.25s ease;
+
+box-shadow:
+0 12px 34px
+rgba(0,255,136,.20);
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+text-align:center;
+
+}
+
+.btn:hover{
+
+transform:
+translateY(-2px);
+
+background:#00eb7c;
+
+}
+
+/* SIMULADOR */
+
+.sim-grid{
+
+display:grid;
+grid-template-columns:1fr 1fr;
+
+gap:14px;
+
+margin-bottom:22px;
+
+}
+
+/* LABELS */
+
+.sim-label{
+
+display:block;
+
+font-size:13px;
+color:#999;
+
+margin-bottom:10px;
+
+text-align:left;
+
+line-height:1.5;
+
+}
+
+.sim-select{
+
+width:100%;
+
+background:#080808;
+
+border:
+1px solid #222;
+
+border-radius:18px;
+
+padding:16px;
+
+color:#00ff88;
+
+font-weight:bold;
+font-size:16px;
+
+}
+
+/* RESULTADO */
+
+.resultado{
+
+margin-top:10px;
+
+max-height:42vh;
+
+overflow-y:auto;
+
+padding-right:6px;
+
+text-align:left;
+
+}
+
+.resultado::-webkit-scrollbar{
+width:6px;
+}
+
+.resultado::-webkit-scrollbar-thumb{
+
+background:#1e1e1e;
+border-radius:999px;
+
+}
+
+/* CARD RESULTADO */
+
+.etapa-card{
+
+background:
+rgba(255,255,255,.03);
+
+border:
+1px solid
+rgba(255,255,255,.06);
+
+border-radius:22px;
+
+padding:18px;
+
+margin-bottom:16px;
+
+backdrop-filter:
+blur(10px);
+
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+.card{
+
+padding:20px;
+border-radius:28px;
+
+}
+
+.title{
+line-height:1.22;
+}
+
+.btn{
+
+width:100%;
+
+padding:15px 26px;
+
+font-size:15px;
+
+}
+
+.sim-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
 </style>
+
 </head>
 
-<body class="p-4 pb-20">
+html id="u6g2xr"
+<body>
 
-<div class="max-w-md mx-auto">
+<div class="app">
 
-<header class="text-center my-8">
-<h1 class="text-4xl font-black gold-text">C3</h1>
+<div class="overlay"></div>
 
-<p class="text-xs text-gray-500 uppercase mt-2">
-Simulador de construção de comunidade
+<div class="card mx-auto mt-4">
+
+<div class="eyebrow">
+Simulador de Construção de Comunidade
+</div>
+
+<h1 class="title">
+
+Simule o crescimento
+da sua comunidade
+
+</h1>
+
+<p class="subtitle mb-6">
+
+Baseado nas regras institucionais
+da Bonífica e no modelo CRC
+de relacionamento e consumo.
+
 </p>
 
-<p class="text-[10px] text-gray-600 mt-1 uppercase">
-1 membro conectando 3 novos membros
-</p>
-</header>
+<div
+class="sim-grid"
+id="simGrid"
+>
 
-<div class="prosff-card rounded-3xl p-4 mb-6 border-dashed border-green-500/30">
+<div>
 
-<div class="grid grid-cols-2 gap-3">
-  <div>
-<label class="text-[10px] text-gray-500 uppercase block mb-1 text-center">
-Consumo mensal
+<label class="sim-label">
+
+Defina o tamanho inicial
+da sua comunidade
+de consumidores
+
 </label>
 
-<select id="consumo"
-class="text-center bg-black border border-gray-700 rounded-xl p-2 w-full text-green-400 font-bold"
-onchange="simular()">
+<select
+id="gestores"
+onchange="simular()"
+class="sim-select"
+>
 
-<option value="300">R$ 300,00</option>
-<option value="350">R$ 350,00</option>
-<option value="400">R$ 400,00</option>
-<option value="450">R$ 450,00</option>
-<option value="500">R$ 500,00</option>
-<option value="550">R$ 550,00</option>
-<option value="600">R$ 600,00</option>
+<option value="3" selected>
+3 consumidores
+</option>
+
+<option value="4">
+4 consumidores
+</option>
+
+<option value="5">
+5 consumidores
+</option>
+
+<option value="6">
+6 consumidores
+</option>
+
+<option value="7">
+7 consumidores
+</option>
+
+<option value="8">
+8 consumidores
+</option>
+
+<option value="9">
+9 consumidores
+</option>
+
+<option value="10">
+10 consumidores
+</option>
 
 </select>
+
 </div>
 
 <div>
-<label class="text-[10px] text-gray-500 uppercase block mb-1 text-center">
-Conexões por etapa
+
+<label class="sim-label">
+
+Escolha o consumo
+mínimo mensal
+da comunidade
+
 </label>
 
-<input id="duplicacao" type="number" value="3"
-class="text-center bg-black border border-gray-700 rounded-xl p-2 w-full text-green-400 font-bold"
-oninput="simular()">
-</div>
+<select
+id="consumo"
+onchange="simular()"
+class="sim-select"
+>
+
+<option value="300" selected>
+R$ 300
+</option>
+
+<option value="350">
+R$ 350
+</option>
+
+<option value="400">
+R$ 400
+</option>
+
+<option value="450">
+R$ 450
+</option>
+
+<option value="500">
+R$ 500
+</option>
+
+<option value="550">
+R$ 550
+</option>
+
+<option value="600">
+R$ 600
+</option>
+
+</select>
 
 </div>
-</div>
-
-<div class="prosff-card rounded-3xl p-6 mb-6 text-center">
-<p class="text-xs text-gray-400">
-No C3 o crescimento acontece pela conexão de novos membros.<br><br>
-<strong class="text-white">Não é sobre velocidade. É sobre consistência.</strong>
-</p>
-</div>
-
-<div class="flex items-center justify-between mb-4">
-<button onclick="voltar()" class="btn-back px-4 py-2 rounded-xl">←</button>
-
-<p class="text-sm font-bold">
-Etapa <span id="mesAtual">1</span> de 12
-</p>
-
-<button onclick="avancar()" class="btn-back px-4 py-2 rounded-xl">→</button>
-</div>
-
-<div id="lista-etapas"></div>
-
-<div class="prosff-card rounded-3xl p-4 mt-6">
-<canvas id="grafico"></canvas>
-</div>
 
 </div>
-<script>
 
-let mesAtual = 1;
-let chart;
+<div
+id="resultado"
+class="resultado"
+>
 
-function avancar(){
-if(mesAtual < 12){
-mesAtual++;
-simular();
-}
-}
+</div>
 
-function voltar(){
-if(mesAtual > 1){
-mesAtual--;
-simular();
-}
-}
+```html id="f0m2vb"
+<div class="flex flex-col gap-3 mt-6">
 
-function getStatus(e){
-if(e===1) return "Início da construção";
-if(e===2) return "Já começa a compensar seu consumo";
-if(e===3) return "Alivia despesas do mês";
-if(e===4) return "Impacto real no orçamento";
-if(e===5) return "Pode substituir uma renda extra";
-return "Renda acima da média";
-}
+<button
+class="btn w-full"
+onclick="
+window.location.href=
+'https://heyzine.com/flip-book/1935ad513c.html#page/8'
+"
+>
 
-function getAcao(e){
-if(e===1) return "Conecte 3 pessoas com o mesmo objetivo";
-if(e===2) return "Apoie seus membros";
-if(e===3) return "Fortaleça sua comunidade";
-return "Desenvolva novos líderes";
-}
+← Voltar para apresentação
 
-function getParams(){
-const params = new URLSearchParams(window.location.search);
-return {
-numero: params.get("wpp") || "5522999231211",
-ref: params.get("ref") || "indicação direta"
-};
-}
+</button>
 
-function voltarAPN(){
-let {numero, ref} = getParams();
-let url = "https://apndigital.vercel.app/?wpp="+numero+"&ref="+ref+"&step=12";
-window.location.href = url;
-}
+<button
+class="btn w-full"
+onclick="
+window.open(
+'https://wa.me/5522999231211?text=Olá!%20Acabei%20de%20concluir%20a%20simulação%20CRC%20e%20gostaria%20de%20entender%20melhor%20meu%20cenário.',
+'_blank'
+)
+"
+>
 
-function simular(){
+Falar no WhatsApp
 
-let VALOR_FIXO = parseFloat(document.getElementById('consumo').value) || 300;
-let DUPLICACAO = parseFloat(document.getElementById('duplicacao').value) || 3;
-
-document.getElementById('mesAtual').innerText = mesAtual;
-
-let container = document.getElementById('lista-etapas');
-container.innerHTML = '';
-
-let rede = 0;
-let ptsAnterior = 0;
-
-let labels = [];
-let ganhos = [];
-
-const tabelaUnilevel = [
-0.05,0.05,0.09,0.05,0.04,0.04,
-0.03,0.03,0.02,0.02,0.01,0.01,0.005,0.005
-];
-
-const tiers = [
-{ pts: 950, pin: 100, vme: 0.5 },
-{ pts: 2450, pin: 200, vme: 0.5 },
-{ pts: 7250, pin: 700, vme: 0.4 },
-{ pts: 14750, pin: 1300, vme: 0.4 },
-{ pts: 27500, pin: 4000, vme: 0.4 },
-{ pts: 60000, pin: 12000, vme: 0.4 },
-{ pts: 122500, pin: 24000, vme: 0.4 }
-];
-for(let e=1; e<=mesAtual; e++){
-
-let novos = Math.pow(DUPLICACAO,e);
-rede += novos;
-
-let faturamento = rede * VALOR_FIXO;
-let ptsMensal = faturamento / 3;
-
-let unilevel = 0;
-for(let g=1; g<=e && g<=14; g++){
-let perc = tabelaUnilevel[g-1] || 0;
-unilevel += Math.pow(DUPLICACAO,g)*VALOR_FIXO*perc;
-}
-
-// 🔥 30D
-let bonus3D = 0;
-let crescimento = ptsMensal - ptsAnterior;
-
-if(e % 2 === 0 && crescimento > 0){
-bonus3D = crescimento;
-}
-
-if(ptsMensal > 27500){
-bonus3D = 0;
-}
-
-let ptsCarreira = ptsMensal + bonus3D;
-
-// PIN
-let pinBonus = 0;
-let ptsPorLinha = ptsCarreira / DUPLICACAO;
-
-for(let t of tiers){
-let ptsValidos = DUPLICACAO * Math.min(ptsPorLinha, t.pts*t.vme);
-if(ptsValidos >= t.pts){
-pinBonus = t.pin;
-}
-}
-
-let total = unilevel + pinBonus;
-
-labels.push("E"+e);
-ganhos.push(Math.floor(total));
-
-ptsAnterior = ptsMensal;
-
-if(e === mesAtual){
-
-container.innerHTML = `
-<div class="prosff-card rounded-2xl p-6 border-l-4 border-l-green-500">
-
-<p class="text-[10px] text-gray-500 uppercase mb-2">Etapa ${mesAtual}</p>
-
-<h3 class="text-lg font-bold mb-2">${rede} membros na sua comunidade</h3>
-
-<p class="text-xs text-green-400 mb-4">${getStatus(e)}</p>
-
-<p class="text-2xl font-black green-text mb-2">
-R$ ${Math.floor(total).toLocaleString('pt-BR')}
-</p>
-
-<p class="text-xs text-gray-400 mb-3">
-Baseado em um consumo que você já teria no seu dia a dia.
-</p>
-
-<p class="text-xs text-gray-400 mb-4">
-${getAcao(e)}
-</p>
-
-<p class="text-xs text-gray-500 mb-5">
-Não é sobre vender.<br>
-É sobre organizar algo que você já faz.
-</p>
-
-<button onclick="voltarAPN()"
-class="bg-green-500 text-black font-bold px-4 py-3 rounded-xl w-full">
-Voltar para apresentação
 </button>
 
 </div>
+
+</div>
+
+</div>
+
+<script>
+
+/* SIMULADOR CRC */
+
+function simular(){
+
+const consumidoresBase =
+parseInt(
+document.getElementById(
+'gestores'
+).value
+);
+
+const consumo =
+parseInt(
+document.getElementById(
+'consumo'
+).value
+);
+
+/* UNILEVEL */
+
+const percentuais = [
+
+0.05,
+0.05,
+0.045,
+0.04,
+0.0275,
+0.02,
+0.005
+
+];
+
+/* NÍVEIS COMPLETOS */
+
+const niveis = [
+
+{
+nome:'Empreendedor',
+pontos:950,
+pin:100
+},
+
+{
+nome:'Senior',
+pontos:2450,
+pin:200
+},
+
+{
+nome:'Expert',
+pontos:7250,
+pin:700
+},
+
+{
+nome:'Enterprise',
+pontos:14750,
+pin:1300
+},
+
+{
+nome:'Diamond',
+pontos:27500,
+pin:4000
+},
+
+{
+nome:'Diamond Expert',
+pontos:60000,
+pin:12000
+},
+
+{
+nome:'Diamond Global',
+pontos:122500,
+pin:24000
+},
+
+{
+nome:'Empresarial Diamond',
+pontos:247500,
+pin:34000
+},
+
+{
+nome:'Imperial Bonific',
+pontos:495000,
+pin:60000
+},
+
+{
+nome:'Majestic Bonific',
+pontos:1475000,
+pin:130000
+},
+
+{
+nome:'Presidencial',
+pontos:3000000,
+pin:250000
+}
+
+];
+
+let html = '';
+
+let camadas = [];
+
+let consumidoresAtivos = 0;
+
+let saldoPontos = 0;
+
+let debitoMesSeguinte = 0;
+
+/* SOMENTE 6 ETAPAS */
+
+for(
+let etapa = 1;
+etapa <= 6;
+etapa++
+){
+
+/* DÉBITO MÊS ANTERIOR */
+
+saldoPontos -=
+debitoMesSeguinte;
+
+if(
+saldoPontos < 0
+){
+saldoPontos = 0;
+}
+
+debitoMesSeguinte = 0;
+
+/* DUPLICAÇÃO */
+
+const novaCamada =
+
+Math.pow(
+consumidoresBase,
+etapa
+);
+
+camadas.push(
+novaCamada
+);
+
+consumidoresAtivos +=
+novaCamada;
+
+/* PONTOS DO MÊS */
+
+const pontosMes =
+
+novaCamada
+*
+(
+consumo / 300
+)
+*
+100;
+
+/* 30D FLEXÍVEL */
+
+let bonus30D = 0;
+
+if(
+etapa > 1
+){
+
+const pontosMesAnterior =
+
+camadas[
+etapa - 2
+]
+*
+(
+consumo / 300
+)
+*
+100;
+
+const metadeMesAnterior =
+
+pontosMesAnterior
+*
+0.5;
+
+if(
+pontosMes >=
+metadeMesAnterior
+){
+
+bonus30D =
+pontosMesAnterior;
+
+}
+
+}
+
+/* SALDO */
+
+saldoPontos +=
+pontosMes
++
+bonus30D;
+
+/* PIN */
+
+let bonusPin = 0;
+
+for(
+let nivel of niveis
+){
+
+if(
+saldoPontos >=
+nivel.pontos
+){
+
+bonusPin =
+nivel.pin;
+
+debitoMesSeguinte =
+nivel.pontos;
+
+}
+
+}
+
+/* UNILEVEL */
+
+let bonusUnilevel = 0;
+
+camadas.forEach(
+(
+camada,
+index
+)=>{
+
+if(
+percentuais[index]
+){
+
+bonusUnilevel +=
+
+(
+camada
+*
+consumo
+)
+*
+percentuais[index];
+
+}
+
+}
+);
+
+/* TOTAL */
+
+const bonusEstimado =
+
+bonusUnilevel
++
+bonusPin;
+
+/* IMAGEM */
+
+const imagemComunidade =
+
+`img/comunidade_${Math.min(
+etapa,
+6
+)}.jpg`;
+
+/* CARD */
+
+html += `
+
+<div class="etapa-card">
+
+<div style="
+display:flex;
+gap:16px;
+align-items:center;
+">
+
+<img
+src="${imagemComunidade}"
+style="
+width:130px;
+height:120px;
+object-fit:cover;
+display:block;
+border-radius:18px;
+flex-shrink:0;
+"
+>
+
+<div
+style="
+flex:1;
+min-width:0;
+"
+>
+
+<div style="
+font-size:14px;
+color:#9d9d9d;
+margin-bottom:6px;
+">
+
+${etapa}ª etapa
+
+</div>
+
+```html id="b2y7rm"
+<div style="
+font-size:18px;
+font-weight:700;
+line-height:1.3;
+margin-bottom:8px;
+">
+
+${consumidoresAtivos
+.toLocaleString(
+'pt-BR'
+)}
+ consumidores ativos
+
+</div>
+
+<div style="
+font-size:28px;
+font-weight:700;
+color:#00ff88;
+line-height:1;
+margin-bottom:10px;
+">
+
+R$
+${bonusEstimado
+.toLocaleString(
+'pt-BR',
+{
+minimumFractionDigits:2
+}
+)}
+
+</div>
+
+<div style="
+font-size:13px;
+line-height:1.5;
+color:#8c8c8c;
+">
+
+Qualificação estimada:
+<b style="color:#ffffff">
+
+${
+bonusPin > 0
+?
+niveis.find(
+n =>
+n.pin === bonusPin
+)?.nome
+||
+'Em evolução'
+:
+'Em construção'
+}
+
+</b>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 `;
-}
+
 }
 
-// gráfico
-if(chart){
-chart.destroy();
-}
-
-chart = new Chart(document.getElementById('grafico'), {
-type: 'line',
-data: {
-labels: labels,
-datasets: [{
-label: 'Evolução de Ganhos',
-data: ganhos,
-borderColor: '#00ff88',
-tension: 0.3
-}]
-}
-});
+document
+.getElementById(
+'resultado'
+)
+.innerHTML =
+html;
 
 }
 
@@ -283,4 +955,6 @@ simular();
 </script>
 
 </body>
-</html>  
+</html>
+
+
