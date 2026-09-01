@@ -59,20 +59,6 @@ html, body{
   overflow:hidden;
 }
 
-/* LOGO */
-.logo{
-  position:absolute;
-  bottom:15px;
-  right:15px;
-  width:36px;
-  height:36px;
-  border-radius:50%;
-  object-fit:cover;
-  opacity:.35;
-  z-index:1;
-  pointer-events:none;
-}
-
 /* TEXTO CABEÇALHO */
 .eyebrow{
   font-size:11px;
@@ -213,17 +199,17 @@ html, body{
     <div class="sim-grid" id="simGrid">
       <div>
         <label class="sim-label">
-          Número inicial de comunidades
+          gestores por comunidade
         </label>
         <select id="gestores" onchange="simular()" class="sim-select">
-          <option value="3" selected>3 comunidades</option>
-          <option value="4">4 comunidades</option>
-          <option value="5">5 comunidades</option>
-          <option value="6">6 comunidades</option>
-          <option value="7">7 comunidades</option>
-          <option value="8">8 comunidades</option>
-          <option value="9">9 comunidades</option>
-          <option value="10">10 comunidades</option>
+          <option value="3" selected>3 gestores</option>
+          <option value="4">4 gestores</option>
+          <option value="5">5 gestores</option>
+          <option value="6">6 gestores</option>
+          <option value="7">7 gestores</option>
+          <option value="8">8 gestores</option>
+          <option value="9">9 gestores</option>
+          <option value="10">10 gestores</option>
         </select>
       </div>
 
@@ -249,7 +235,7 @@ html, body{
 
 <script>
 function simular(){
-  const comunidadesBase = parseInt(document.getElementById('gestores').value);
+  const gestoresPorComunidade = parseInt(document.getElementById('gestores').value);
   const consumo = parseInt(document.getElementById('consumo').value);
 
   const percentuais = [0.05, 0.05, 0.045, 0.04, 0.0275, 0.02, 0.005];
@@ -270,7 +256,7 @@ function simular(){
 
   let html = '';
   let camadas = [];
-  let comunidadesAtivas = 0;
+  let pessoasAtivas = 0;
   let saldoPontos = 0;
   let debitoMesSeguinte = 0;
 
@@ -279,11 +265,14 @@ function simular(){
     if(saldoPontos < 0) saldoPontos = 0;
     debitoMesSeguinte = 0;
 
-    const novaCamada = Math.pow(comunidadesBase, etapa);
-    camadas.push(novaCamada);
-    comunidadesAtivas += novaCamada;
+    const novaCamadaPessoas = Math.pow(gestoresPorComunidade, etapa);
+    camadas.push(novaCamadaPessoas);
+    pessoasAtivas += novaCamadaPessoas;
 
-    const pontosMes = novaCamada * (consumo / 300) * 100;
+    // Cálculo do número de comunidades (Pessoas Ativas / Gestores Por Comunidade)
+    const numeroComunidades = pessoasAtivas / gestoresPorComunidade;
+
+    const pontosMes = novaCamadaPessoas * (consumo / 300) * 100;
 
     let bonus30D = 0;
     if(etapa > 1){
@@ -320,7 +309,7 @@ function simular(){
     <div class="etapa-card">
       <div class="etapa-info-left">
         <span class="etapa-num">${etapa}ª Etapa</span>
-        <span class="etapa-comunidades">${comunidadesAtivas.toLocaleString('pt-BR')} comunidades</span>
+        <span class="etapa-comunidades">${numeroComunidades.toLocaleString('pt-BR')} comunidades</span>
         <span class="etapa-qualificacao">Qualificação: <b style="color:#fff">${nomeQualificacao}</b></span>
       </div>
       <div class="etapa-valor">
