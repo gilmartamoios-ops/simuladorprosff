@@ -2,981 +2,339 @@
 <html lang="pt-br">
 
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0, viewport-fit=cover"
->
-
-<title>
-CRC | Simulador de Comunidade
-</title>
-
-<meta
-name="description"
-content="Simulador CRC de construção de comunidade e relacionamento de consumo."
->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CRC | Simulador de Comunidade</title>
+<meta name="description" content="Simulador CRC de construção de comunidade e relacionamento de consumo.">
 
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-
 /* RESET */
+*{ margin:0; padding:0; box-sizing:border-box; }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-html,
-body{
-
-width:100%;
-height:100%;
-
-font-family:Arial,sans-serif;
-
-background:#050505;
-color:white;
-
-overflow-y:auto;
-overflow-x:hidden;
-
+html, body{
+  width:100%;
+  height:100%;
+  font-family:Arial,sans-serif;
+  background:#050505;
+  color:white;
+  overflow:hidden;
 }
 
 /* APP */
-
 .app{
-
-position:relative;
-width:100%;
-height:100dvh;
-
-overflow:hidden;
-
-}
-
-/* BACKGROUND */
-
-.bg{
-
-position:absolute;
-inset:0;
-
-width:100%;
-height:100%;
-
-object-fit:cover;
-object-position:center;
-
-filter:
-brightness(.45)
-contrast(1.04);
-
-transform:
-scale(1.04);
-
+  position:relative;
+  width:100%;
+  height:100dvh;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px;
 }
 
 /* OVERLAY */
-
 .overlay{
-
-position:absolute;
-inset:0;
-
-background:
-linear-gradient(
-to top,
-rgba(0,0,0,.92),
-rgba(0,0,0,.35)
-);
-
+  position:absolute;
+  inset:0;
+  background: linear-gradient(to top, rgba(0,0,0,.95), rgba(0,0,0,.4));
 }
 
-/* CARD */
-
+/* CARD CONTAINER PRINCIPAL */
 .card{
-
-position:relative;
-z-index:2;
-
-width:100%;
-max-width:820px;
-
-margin:auto;
-
-background:
-rgba(0,0,0,.16);
-
-backdrop-filter:
-blur(16px);
-
-border:
-1px solid
-rgba(255,255,255,.08);
-
-border-radius:34px;
-
-padding:18px;
-
-box-shadow:
-0 12px 40px
-rgba(0,0,0,.28);
-
-min-height:95vh;
-
-overflow:visible;
-
+  position:relative;
+  z-index:2;
+  width:100%;
+  max-width:760px;
+  background: rgba(0,0,0,.25);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius:24px;
+  padding:16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  display:flex;
+  flex-direction:column;
+  max-height:96vh;
+  overflow:hidden;
 }
-
-/* NOVO */
-
-.card{
-
-position:relative;
-z-index:2;
-
-width:100%;
-max-width:820px;
-
-background:
-rgba(0,0,0,.16);
-
-backdrop-filter:
-blur(16px);
-
-border:
-1px solid
-rgba(255,255,255,.08);
-
-border-radius:34px;
-
-padding:18px;
-
-box-shadow:
-0 12px 40px
-rgba(0,0,0,.28);
-
-display:flex;
-flex-direction:column;
-
-height:95vh;
-
-overflow:hidden;
-
-justify-content:flex-start;
-
-}
-
 
 /* LOGO */
-
 .logo{
-
-position:absolute;
-
-bottom:20px;
-right:20px;
-
-width:44px;
-height:44px;
-
-border-radius:50%;
-
-object-fit:cover;
-
-opacity:.35;
-
-z-index:1;
-
-pointer-events:none;
-
+  position:absolute;
+  bottom:15px;
+  right:15px;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  object-fit:cover;
+  opacity:.35;
+  z-index:1;
+  pointer-events:none;
 }
 
-/* TEXTO */
-
+/* TEXTO CABEÇALHO */
 .eyebrow{
-
-font-size:12px;
-
-letter-spacing:2px;
-text-transform:uppercase;
-
-color:
-rgba(255,255,255,.64);
-
-margin-bottom:18px;
-
+  font-size:11px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color: rgba(255,255,255,.64);
+  margin-bottom:4px;
 }
 
 .title{
-
-font-size:
-clamp(18px,2.2vw,34px);
-
-line-height:1.2;
-
-margin-bottom:10px;
-
-font-weight:600;
-
+  font-size: clamp(16px,2vw,24px);
+  line-height:1.2;
+  margin-bottom:4px;
+  font-weight:600;
 }
+
 .subtitle{
-
-font-size:
-clamp(13px,1vw,16px);
-
-line-height:1.5;
-
-max-width:680px;
-
-margin-bottom:10px;
-
-}
-/* BOTÃO */
-
-.btn{
-
-margin-top:28px;
-
-border:none;
-cursor:pointer;
-
-background:#00ff88;
-color:#07120d;
-
-padding:18px 34px;
-
-font-size:16px;
-font-weight:700;
-
-border-radius:999px;
-
-transition:.25s ease;
-
-box-shadow:
-0 12px 34px
-rgba(0,255,136,.20);
-
-display:flex;
-justify-content:center;
-align-items:center;
-
-text-align:center;
-
+  font-size: clamp(11px,1vw,13px);
+  line-height:1.4;
+  color: rgba(255,255,255,.7);
+  margin-bottom:12px;
 }
 
-.btn:hover{
-
-transform:
-translateY(-2px);
-
-background:#00eb7c;
-
-}
-
-/* SIMULADOR */
-
+/* SIMULADOR FILTROS */
 .sim-grid{
-
-display:grid;
-grid-template-columns:1fr 1fr;
-
-gap:14px;
-
-margin-bottom:22px;
-
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:12px;
 }
-
-/* LABELS */
 
 .sim-label{
-
-display:block;
-
-font-size:13px;
-color:#999;
-
-margin-bottom:10px;
-
-text-align:left;
-
-line-height:1.5;
-
+  display:block;
+  font-size:11px;
+  color:#aaa;
+  margin-bottom:4px;
+  text-align:left;
+  line-height:1.3;
 }
 
 .sim-select{
-
-width:100%;
-
-background:#080808;
-
-border:
-1px solid #222;
-
-border-radius:18px;
-
-padding:16px;
-
-color:#00ff88;
-
-font-weight:bold;
-font-size:16px;
-
+  width:100%;
+  background:#080808;
+  border: 1px solid #222;
+  border-radius:12px;
+  padding:8px 12px;
+  color:#00ff88;
+  font-weight:bold;
+  font-size:14px;
+  outline:none;
 }
 
-/* RESULTADO */
-
+/* RESULTADO CONTAINER */
 .resultado{
-
-margin-top:10px;
-
-flex:1;
-
-overflow-y:auto;
-
-padding-bottom:20px;
-
-min-height:0;
-
-} 
-.resultado::-webkit-scrollbar{
-width:6px;
+  flex:1;
+  overflow-y:auto;
+  padding-right:4px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
 }
 
-.resultado::-webkit-scrollbar-thumb{
+.resultado::-webkit-scrollbar{ width:4px; }
+.resultado::-webkit-scrollbar-thumb{ background:#222; border-radius:999px; }
 
-background:#1e1e1e;
-border-radius:999px;
-
-}
-
-/* CARD RESULTADO */
-
+/* CARD ETAPA COMPACTO */
 .etapa-card{
-
-background:
-rgba(255,255,255,.03);
-
-border:
-1px solid
-rgba(255,255,255,.06);
-
-border-radius:22px;
-
-padding:22px;
-
-margin-bottom:18px;
-
-backdrop-filter:
-blur(10px);
-
-min-height:180px;
-
-display:flex;
-align-items:center;
-
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius:14px;
+  padding:10px 14px;
+  backdrop-filter: blur(10px);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-/* MOBILE */
-
-@media(max-width:768px){
-
-.card{
-
-padding:20px;
-border-radius:28px;
-
+.etapa-info-left{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
 }
 
-.title{
-line-height:1.22;
+.etapa-num{
+  font-size:11px;
+  color:#777;
+  text-transform:uppercase;
+  letter-spacing:1px;
 }
 
-.btn{
-
-width:100%;
-
-padding:15px 26px;
-
-font-size:15px;
-
+.etapa-comunidades{
+  font-size:15px;
+  font-weight:700;
+  color:#fff;
 }
 
-.sim-grid{
-
-grid-template-columns:1fr;
-
+.etapa-qualificacao{
+  font-size:11px;
+  color:#8c8c8c;
 }
 
+.etapa-valor{
+  font-size:20px;
+  font-weight:700;
+  color:#00ff88;
+  text-align:right;
 }
 
+/* MOBILE RESPONSIVO */
+@media(max-width:640px){
+  .card{ padding:12px; }
+  .sim-grid{ grid-template-columns:1fr; gap:8px; }
+  .etapa-card{ padding:8px 10px; }
+  .etapa-comunidades{ font-size:13px; }
+  .etapa-valor{ font-size:17px; }
+}
 </style>
-
 </head>
 
 <body>
 
 <div class="app">
+  <div class="overlay"></div>
 
-<div class="overlay"></div>
+  <div class="card mx-auto">
+    <div class="eyebrow">
+      Simulador CRC | Modelo de Comunidades
+    </div>
 
-<div class="card mx-auto mt-4">
+    <h1 class="title">
+      Simule a expansão da sua comunidade
+    </h1>
 
-<div class="eyebrow">
-Simulador de Construção de Comunidade
-</div>
+    <p class="subtitle">
+      Baseado na expansão de núcleos e no consumo recorrente do modelo CRC.
+    </p>
 
-<h1 class="title">
+    <div class="sim-grid" id="simGrid">
+      <div>
+        <label class="sim-label">
+          Número inicial de comunidades
+        </label>
+        <select id="gestores" onchange="simular()" class="sim-select">
+          <option value="3" selected>3 comunidades</option>
+          <option value="4">4 comunidades</option>
+          <option value="5">5 comunidades</option>
+          <option value="6">6 comunidades</option>
+          <option value="7">7 comunidades</option>
+          <option value="8">8 comunidades</option>
+          <option value="9">9 comunidades</option>
+          <option value="10">10 comunidades</option>
+        </select>
+      </div>
 
-Simule o crescimento
-da sua comunidade
+      <div>
+        <label class="sim-label">
+          Consumo mínimo mensal da comunidade
+        </label>
+        <select id="consumo" onchange="simular()" class="sim-select">
+          <option value="300" selected>R$ 300</option>
+          <option value="350">R$ 350</option>
+          <option value="400">R$ 400</option>
+          <option value="450">R$ 450</option>
+          <option value="500">R$ 500</option>
+          <option value="550">R$ 550</option>
+          <option value="600">R$ 600</option>
+        </select>
+      </div>
+    </div>
 
-</h1>
-
-<p class="subtitle mb-6">
-
-Baseado nas regras institucionais
-da Bonífica e no modelo CRC
-de relacionamento e consumo.
-
-</p>
-
-<div
-class="sim-grid"
-id="simGrid"
->
-
-<div>
-
-<label class="sim-label">
-
-Defina o tamanho inicial
-da sua comunidade
-de consumidores
-
-</label>
-
-<select
-id="gestores"
-onchange="simular()"
-class="sim-select"
->
-
-<option value="3" selected>
-3 consumidores
-</option>
-
-<option value="4">
-4 consumidores
-</option>
-
-<option value="5">
-5 consumidores
-</option>
-
-<option value="6">
-6 consumidores
-</option>
-
-<option value="7">
-7 consumidores
-</option>
-
-<option value="8">
-8 consumidores
-</option>
-
-<option value="9">
-9 consumidores
-</option>
-
-<option value="10">
-10 consumidores
-</option>
-
-</select>
-
-</div>
-
-<div>
-
-<label class="sim-label">
-
-Escolha o consumo
-mínimo mensal
-da comunidade
-
-</label>
-
-<select
-id="consumo"
-onchange="simular()"
-class="sim-select"
->
-
-<option value="300" selected>
-R$ 300
-</option>
-
-<option value="350">
-R$ 350
-</option>
-
-<option value="400">
-R$ 400
-</option>
-
-<option value="450">
-R$ 450
-</option>
-
-<option value="500">
-R$ 500
-</option>
-
-<option value="550">
-R$ 550
-</option>
-
-<option value="600">
-R$ 600
-</option>
-
-</select>
-
-</div>
-
-</div>
-
-<div
-id="resultado"
-class="resultado"
->
-
-</div>
-
-<div class="flex flex-col gap-3 mt-6">
-
-<button
-class="btn w-full"
-onclick="
-window.location.href=
-'https://heyzine.com/flip-book/1935ad513c.html#page/8'
-"
->
-
-← Voltar para apresentação
-
-</button>
-
-<button
-class="btn w-full"
-onclick="
-window.open(
-'https://wa.me/5522999231211?text=Olá!%20Acabei%20de%20concluir%20a%20simulação%20CRC%20e%20gostaria%20de%20entender%20melhor%20meu%20cenário.',
-'_blank'
-)
-"
->
-
-Falar no WhatsApp
-
-</button>
-
-</div>
-
-</div>
-
+    <div id="resultado" class="resultado"></div>
+  </div>
 </div>
 
 <script>
-
-/* SIMULADOR CRC */
-
 function simular(){
-
-const consumidoresBase =
-parseInt(
-document.getElementById(
-'gestores'
-).value
-);
-
-const consumo =
-parseInt(
-document.getElementById(
-'consumo'
-).value
-);
-
-/* UNILEVEL */
-
-const percentuais = [
-
-0.05,
-0.05,
-0.045,
-0.04,
-0.0275,
-0.02,
-0.005
-
-];
-
-/* NÍVEIS COMPLETOS */
-
-const niveis = [
-
-{
-nome:'Empreendedor',
-pontos:950,
-pin:100
-},
-
-{
-nome:'Senior',
-pontos:2450,
-pin:200
-},
-
-{
-nome:'Expert',
-pontos:7250,
-pin:700
-},
-
-{
-nome:'Enterprise',
-pontos:14750,
-pin:1300
-},
-
-{
-nome:'Diamond',
-pontos:27500,
-pin:4000
-},
-
-{
-nome:'Diamond Expert',
-pontos:60000,
-pin:12000
-},
-
-{
-nome:'Diamond Global',
-pontos:122500,
-pin:24000
-},
-
-{
-nome:'Empresarial Diamond',
-pontos:247500,
-pin:34000
-},
-
-{
-nome:'Imperial Bonific',
-pontos:495000,
-pin:60000
-},
-
-{
-nome:'Majestic Bonific',
-pontos:1475000,
-pin:130000
-},
-
-{
-nome:'Presidencial',
-pontos:3000000,
-pin:250000
-}
-
-];
-
-let html = '';
-
-let camadas = [];
-
-let consumidoresAtivos = 0;
-
-let saldoPontos = 0;
-
-let debitoMesSeguinte = 0;
-
-/* SOMENTE 6 ETAPAS */
-
-for(
-let etapa = 1;
-etapa <= 6;
-etapa++
-){
-
-/* DÉBITO MÊS ANTERIOR */
-
-saldoPontos -=
-debitoMesSeguinte;
-
-if(
-saldoPontos < 0
-){
-saldoPontos = 0;
-}
-
-debitoMesSeguinte = 0;
-
-/* DUPLICAÇÃO */
-
-const novaCamada =
-
-Math.pow(
-consumidoresBase,
-etapa
-);
-
-camadas.push(
-novaCamada
-);
-
-consumidoresAtivos +=
-novaCamada;
-
-/* PONTOS DO MÊS */
-
-const pontosMes =
-
-novaCamada
-*
-(
-consumo / 300
-)
-*
-100;
-
-/* 30D FLEXÍVEL */
-
-let bonus30D = 0;
-
-if(
-etapa > 1
-){
-
-const pontosMesAnterior =
-
-camadas[
-etapa - 2
-]
-*
-(
-consumo / 300
-)
-*
-100;
-
-const metadeMesAnterior =
-
-pontosMesAnterior
-*
-0.5;
-
-if(
-pontosMes >=
-metadeMesAnterior
-){
-
-bonus30D =
-pontosMesAnterior;
-
-}
-
-}
-
-/* SALDO */
-
-saldoPontos +=
-pontosMes
-+
-bonus30D;
-
-/* PIN */
-
-let bonusPin = 0;
-
-for(
-let nivel of niveis
-){
-
-if(
-saldoPontos >=
-nivel.pontos
-){
-
-bonusPin =
-nivel.pin;
-
-debitoMesSeguinte =
-nivel.pontos;
-
-}
-
-}
-
-/* UNILEVEL */
-
-let bonusUnilevel = 0;
-
-camadas.forEach(
-(
-camada,
-index
-)=>{
-
-if(
-percentuais[index]
-){
-
-bonusUnilevel +=
-
-(
-camada
-*
-consumo
-)
-*
-percentuais[index];
-
-}
-
-}
-);
-
-/* TOTAL */
-
-const bonusEstimado =
-
-bonusUnilevel
-+
-bonusPin;
-
-/* IMAGEM */
-
-const imagemComunidade =
-
-`./img/comunidade_${Math.min(
-etapa,
-6
-)}.jpg`;
-
-/* CARD */
-
-html += `
-
-<div class="etapa-card">
-
-<div style="
-display:block;
-">
-
-<div>
-
-<div style="
-width:100%;
-">
-
-${etapa}ª etapa
-
-</div>
-
-<div style="
-font-size:24px;
-font-weight:700;
-line-height:1.3;
-margin-bottom:12px;
-">
-
-${consumidoresAtivos
-.toLocaleString(
-'pt-BR'
-)}
- consumidores ativos
-
-</div>
-
-<div style="
-font-size:36px;
-font-weight:700;
-color:#00ff88;
-line-height:1;
-margin-bottom:14px;
-">
-
-R$
-${bonusEstimado
-.toLocaleString(
-'pt-BR',
-{
-minimumFractionDigits:2
-}
-)}
-
-</div>
-
-<div style="
-font-size:13px;
-line-height:1.5;
-color:#8c8c8c;
-">
-
-Qualificação estimada:
-<b style="color:#ffffff">
-
-${
-bonusPin > 0
-?
-niveis.find(
-n =>
-n.pin === bonusPin
-)?.nome
-||
-'Em evolução'
-:
-'Em construção'
-}
-
-</b>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-`;
-
-}
-
-document
-.getElementById(
-'resultado'
-)
-.innerHTML =
-html;
-
+  const comunidadesBase = parseInt(document.getElementById('gestores').value);
+  const consumo = parseInt(document.getElementById('consumo').value);
+
+  const percentuais = [0.05, 0.05, 0.045, 0.04, 0.0275, 0.02, 0.005];
+
+  const niveis = [
+    { nome:'Empreendedor', pontos:950, pin:100 },
+    { nome:'Senior', pontos:2450, pin:200 },
+    { nome:'Expert', pontos:7250, pin:700 },
+    { nome:'Enterprise', pontos:14750, pin:1300 },
+    { nome:'Diamond', pontos:27500, pin:4000 },
+    { nome:'Diamond Expert', pontos:60000, pin:12000 },
+    { nome:'Diamond Global', pontos:122500, pin:24000 },
+    { nome:'Empresarial Diamond', pontos:247500, pin:34000 },
+    { nome:'Imperial Bonific', pontos:495000, pin:60000 },
+    { nome:'Majestic Bonific', pontos:1475000, pin:130000 },
+    { nome:'Presidencial', pontos:3000000, pin:250000 }
+  ];
+
+  let html = '';
+  let camadas = [];
+  let comunidadesAtivas = 0;
+  let saldoPontos = 0;
+  let debitoMesSeguinte = 0;
+
+  for(let etapa = 1; etapa <= 6; etapa++){
+    saldoPontos -= debitoMesSeguinte;
+    if(saldoPontos < 0) saldoPontos = 0;
+    debitoMesSeguinte = 0;
+
+    const novaCamada = Math.pow(comunidadesBase, etapa);
+    camadas.push(novaCamada);
+    comunidadesAtivas += novaCamada;
+
+    const pontosMes = novaCamada * (consumo / 300) * 100;
+
+    let bonus30D = 0;
+    if(etapa > 1){
+      const pontosMesAnterior = camadas[etapa - 2] * (consumo / 300) * 100;
+      if(pontosMes >= (pontosMesAnterior * 0.5)){
+        bonus30D = pontosMesAnterior;
+      }
+    }
+
+    saldoPontos += pontosMes + bonus30D;
+
+    let bonusPin = 0;
+    for(let nivel of niveis){
+      if(saldoPontos >= nivel.pontos){
+        bonusPin = nivel.pin;
+        debitoMesSeguinte = nivel.pontos;
+      }
+    }
+
+    let bonusUnilevel = 0;
+    camadas.forEach((camada, index) => {
+      if(percentuais[index]){
+        bonusUnilevel += (camada * consumo) * percentuais[index];
+      }
+    });
+
+    const bonusEstimado = bonusUnilevel + bonusPin;
+
+    const nomeQualificacao = bonusPin > 0 
+      ? (niveis.find(n => n.pin === bonusPin)?.nome || 'Em evolução') 
+      : 'Em construção';
+
+    html += `
+    <div class="etapa-card">
+      <div class="etapa-info-left">
+        <span class="etapa-num">${etapa}ª Etapa</span>
+        <span class="etapa-comunidades">${comunidadesAtivas.toLocaleString('pt-BR')} comunidades</span>
+        <span class="etapa-qualificacao">Qualificação: <b style="color:#fff">${nomeQualificacao}</b></span>
+      </div>
+      <div class="etapa-valor">
+        R$ ${bonusEstimado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+      </div>
+    </div>
+    `;
+  }
+
+  document.getElementById('resultado').innerHTML = html;
 }
 
 simular();
-
 </script>
 
 </body>
 </html>
-
-
