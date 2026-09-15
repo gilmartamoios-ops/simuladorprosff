@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -167,6 +168,40 @@ html, body{
   text-align:right;
 }
 
+/* RETORNO AO SCOUT */
+.retorno-scout{
+  display:flex;
+  justify-content:center;
+  padding-top:12px;
+  margin-top:4px;
+  flex-shrink:0;
+}
+
+.retorno-scout a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  max-width:420px;
+  min-height:44px;
+  padding:10px 18px;
+  border:1px solid rgba(0,255,136,.35);
+  border-radius:12px;
+  background:rgba(0,255,136,.08);
+  color:#00ff88;
+  text-decoration:none;
+  font-size:14px;
+  font-weight:700;
+  transition:all .2s ease;
+}
+
+.retorno-scout a:hover{
+  background:rgba(0,255,136,.14);
+  border-color:rgba(0,255,136,.65);
+  transform:translateY(-1px);
+}
+
 /* MOBILE RESPONSIVO */
 @media(max-width:640px){
   .card{ padding:12px; }
@@ -230,6 +265,13 @@ html, body{
     </div>
 
     <div id="resultado" class="resultado"></div>
+
+    <div class="retorno-scout">
+      <a href="https://crc-scout.vercel.app/?etapa=quiz">
+        Continuar no SCOUT
+        <span>→</span>
+      </a>
+    </div>
   </div>
 </div>
 
@@ -269,7 +311,6 @@ function simular(){
     camadas.push(novaCamadaPessoas);
     pessoasAtivas += novaCamadaPessoas;
 
-    // Cálculo do número de comunidades (Pessoas Ativas / Gestores Por Comunidade)
     const numeroComunidades = pessoasAtivas / gestoresPorComunidade;
 
     const pontosMes = novaCamadaPessoas * (consumo / 300) * 100;
@@ -301,8 +342,8 @@ function simular(){
 
     const bonusEstimado = bonusUnilevel + bonusPin;
 
-    const nomeQualificacao = bonusPin > 0 
-      ? (niveis.find(n => n.pin === bonusPin)?.nome || 'Em evolução') 
+    const nomeQualificacao = bonusPin > 0
+      ? (niveis.find(n => n.pin === bonusPin)?.nome || 'Em evolução')
       : 'Em construção';
 
     html += `
@@ -327,3 +368,4 @@ simular();
 
 </body>
 </html>
+
