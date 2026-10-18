@@ -42,7 +42,7 @@ html, body{
   background: linear-gradient(to top, rgba(0,0,0,.95), rgba(0,0,0,.4));
 }
 
-/* CARD CONTAINER AJUSTADO PARA NÃO CORTAR NO MOBILE */
+/* CARD CONTAINER PRINCIPAL */
 .card{
   position:relative;
   z-index:2;
@@ -56,7 +56,7 @@ html, body{
   box-shadow: 0 12px 40px rgba(0,0,0,.35);
   display:flex;
   flex-direction:column;
-  min-height:92vh;
+  min-height:94vh;
 }
 
 .eyebrow{
@@ -87,7 +87,7 @@ html, body{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 
 .sim-label{
@@ -111,13 +111,29 @@ html, body{
   outline:none;
 }
 
-/* ÁREA DO GRÁFICO COM MARGEM SUPERIOR EXTRA PARA RÓTULOS */
+/* ÁREA DO GRÁFICO COM MARGEM SUPERIOR EXTRA */
 .chart-container{
   position:relative;
   width:100%;
   flex:1;
-  min-height:250px;
+  min-height:220px;
   margin-bottom:8px;
+}
+
+/* CARD EXPLICATIVO DINÂMICO DO RESULTADO */
+.info-card{
+  background: rgba(0, 255, 136, 0.05);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #e2e8f0;
+}
+
+.info-card strong{
+  color: #00ff88;
 }
 
 .retorno-scout{
@@ -146,13 +162,13 @@ html, body{
   font-weight:700;
 }
 
-/* AJUSTES EXCLUSIVOS PARA MOBILE */
+/* MOBILE RESPONSIVO */
 @media(max-width:640px){
   .app{ padding:4px; }
   .card{ padding:12px; min-height:96vh; }
   .sim-grid{ grid-template-columns:1fr; gap:6px; margin-bottom:8px; }
   .sim-select{ font-size:11px; padding:7px 9px; }
-  .chart-container{ min-height:220px; }
+  .chart-container{ min-height:190px; }
 }
 </style>
 </head>
@@ -175,7 +191,7 @@ html, body{
       Projeção baseada em GCom - gestores de comunidade e consumo recorrente.
     </p>
 
-    <!-- FILTROS ATUALIZADOS: MODO INICIANTE VS EXECUTIVO -->
+    <!-- FILTROS: APENAS 3 MODELOS (INICIANTE, EXANSAO, EXECUTIVO) -->
     <div class="sim-grid" id="simGrid">
       <div>
         <label class="sim-label">
@@ -183,9 +199,8 @@ html, body{
         </label>
         <select id="gestores" onchange="simular()" class="sim-select">
           <option value="2">2 Novos Gestores / Etapa (Modo Iniciante)</option>
-          <option value="3">3 Novos Gestores / Etapa</option>
-          <option value="4" selected>4 Novos Gestores / Etapa (Modo Executivo - Recomendado)</option>
-          <option value="5">5 Novos Gestores / Etapa</option>
+          <option value="3">3 Novos Gestores / Etapa (Modo Expansão)</option>
+          <option value="4" selected>4 Novos Gestores / Etapa (Modo Executivo)</option>
         </select>
       </div>
 
@@ -195,16 +210,19 @@ html, body{
         </label>
         <select id="consumo" onchange="simular()" class="sim-select">
           <option value="300">R$ 300,00</option>
-          <option value="450" selected>R$ 450,00 (Padrão Executivo)</option>
+          <option value="450" selected>R$ 450,00 (Padrão Executivo - Recomendado)</option>
           <option value="500">R$ 500,00</option>
         </select>
       </div>
     </div>
 
-    <!-- GRÁFICO EXPANDIDO COM MARGEM DE SEGURANÇA SUPERIOR -->
+    <!-- GRÁFICO EXPANDIDO -->
     <div class="chart-container">
       <canvas id="meuGrafico"></canvas>
     </div>
+
+    <!-- CARACTERÍSTICA DO RESULTADO SELECIONADO -->
+    <div id="infoCard" class="info-card"></div>
 
     <div class="retorno-scout">
       <a href="https://crc-scout.vercel.app/?etapa=quiz">
@@ -220,24 +238,38 @@ Chart.register(ChartDataLabels);
 
 let chartInstance = null;
 
-// Tabela Oficial de Resultados
+// Tabela Oficial com Bônus Evolution (R$ 250) Incluído no Modo Executivo (R$ 1.186,00 na 2ª Etapa)
 const simulacaoOficial = {
   // Modo Executivo (4x450)
   "4_450": [
     { etapa: 1, gcom: 4, plano: "Executivo", total: 360.00 },
-    { etapa: 2, gcom: 24, plano: "Topázio", total: 936.00 },
+    { etapa: 2, gcom: 24, plano: "Ônix", total: 1186.00 }, // Inclui R$ 250 de Bônus Evolution!
     { etapa: 3, gcom: 108, plano: "Jaspe", total: 7038.00 },
     { etapa: 4, gcom: 448, plano: "Jade", total: 21240.00 },
     { etapa: 5, gcom: 1812, plano: "Dream Red", total: 68094.00 }
+  ],
+  // Modo Expansão (3x450)
+  "3_450": [
+    { etapa: 1, gcom: 3, plano: "Executivo", total: 270.00 },
+    { etapa: 2, gcom: 15, plano: "Topázio", total: 634.50 },
+    { etapa: 3, gcom: 54, plano: "Ametista", total: 3915.00 },
+    { etapa: 4, gcom: 174, plano: "Diamante Negro", total: 13392.00 },
+    { etapa: 5, gcom: 537, plano: "Jaspe", total: 41094.00 }
   ],
   // Modo Iniciante (2x450)
   "2_450": [
     { etapa: 1, gcom: 2, plano: "Executivo", total: 180.00 },
     { etapa: 2, gcom: 8, plano: "Topázio", total: 378.00 },
-    { etapa: 3, gcom: 22, plano: "Ônix", total: 1060.00 },
-    { etapa: 4, gcom: 52, plano: "Ametista", total: 2210.00 },
+    { etapa: 3, gcom: 22, plano: "Ônix", total: 1310.00 }, // Inclui R$ 250 de Bônus Evolution
+    { etapa: 4, gcom: 52, plano: "Ametista", total: 2710.00 },
     { etapa: 5, gcom: 114, plano: "Diamante Negro", total: 6552.00 }
   ]
+};
+
+const textosExplicativos = {
+  "2": "🌱 <strong>Característica do Modo Iniciante (2 Gestores):</strong> Modelo de entrada com altíssima facilidade de duplicação. A partir da 3ª etapa, o bônus gerado cobre integralmente as parcelas do kit inicial no cartão de crédito e gera lucro líquido crescente com baixo esforço de recrutamento.",
+  "3": "🚀 <strong>Característica do Modo Expansão (3 Gestores):</strong> Ritmo equilibrado de transição para liderança de comunidade. Acelera os ganhos de Unilevel e atinge a faixa de R$ 3.900,00 a R$ 13.000,00 com rápida formação de núcleo.",
+  "4": "💼 <strong>Característica do Modo Executivo (4 Gestores):</strong> O padrão profissional de máxima performance. Otimiza a pontuação por linha (VML), garante o Bônus Evolution e PLR acelerados, atingindo graduações de elite (Jaspe e Jade) com solidez de rede."
 };
 
 function simular(){
@@ -250,6 +282,7 @@ function simular(){
   if(simulacaoOficial[key]){
     dadosEtapas = simulacaoOficial[key];
   } else {
+    // Cálculo de aproximação
     let gcomAcum = 0;
     for(let e = 1; e <= 5; e++){
       let novos = Math.pow(d, e);
@@ -258,7 +291,7 @@ function simular(){
       let fator = (c / 450) * (d / 4);
       let baseTotal = 0;
       if(e === 1) baseTotal = 360 * fator;
-      else if(e === 2) baseTotal = 936 * fator;
+      else if(e === 2) baseTotal = 1186 * fator;
       else if(e === 3) baseTotal = 7038 * fator;
       else if(e === 4) baseTotal = 21240 * fator;
       else if(e === 5) baseTotal = 68094 * fator;
@@ -284,6 +317,9 @@ function simular(){
     gcomsList.push(item.gcom);
   });
 
+  // Atualiza texto explicativo
+  document.getElementById('infoCard').innerHTML = textosExplicativos[d.toString()] || "";
+
   renderizarGrafico(labels, valoresGanhos, gcomsList);
 }
 
@@ -308,7 +344,6 @@ function renderizarGrafico(labels, dadosValores, dadosGcom) {
       responsive: true,
       maintainAspectRatio: false,
       layout: {
-        // MARGEM SUPERIOR AUMENTADA PARA GARANTIR VISIBILIDADE NO MOBILE
         padding: { top: 38, left: 5, right: 5, bottom: 5 }
       },
       plugins: {
