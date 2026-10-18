@@ -111,32 +111,48 @@ html, body{
   outline:none;
 }
 
-/* CARD EXPLICATIVO EM DESTAQUE - NO TOPO ANTES DO GRÁFICO */
-.info-card-top{
-  background: rgba(0, 255, 136, 0.08);
-  border: 1px solid rgba(0, 255, 136, 0.35);
-  border-left: 4px solid #00ff88;
-  border-radius: 10px;
-  padding: 10px 12px;
-  margin-bottom: 10px;
-  font-size: 11px;
-  line-height: 1.4;
-  color: #f1f5f9;
-  box-shadow: 0 4px 15px rgba(0,255,136,0.05);
-}
-
-.info-card-top strong{
-  color: #00ff88;
-  font-size: 12px;
-}
-
-/* ÁREA DO GRÁFICO EXPANDIDO */
-.chart-container{
+/* ÁREA DO GRÁFICO COM QUADRADO DE EXPLICAÇÃO SOBREPOSTO */
+.chart-wrapper{
   position:relative;
   width:100%;
   flex:1;
-  min-height:210px;
+  min-height:240px;
   margin-bottom:8px;
+  display:flex;
+}
+
+/* QUADRADO DESTACADO NA PARTE ESQUERDA DO GRÁFICO */
+.info-box-left{
+  position: absolute;
+  left: 10px;
+  top: 15px;
+  width: 38%;
+  max-width: 280px;
+  z-index: 10;
+  background: rgba(0, 255, 136, 0.08);
+  border: 2px solid #00ff88;
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 1.45;
+  box-shadow: 0 8px 25px rgba(0, 255, 136, 0.15);
+  backdrop-filter: blur(8px);
+}
+
+.info-box-left strong{
+  display: block;
+  font-size: 12px;
+  color: #00ff88;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* CANVAS DO GRÁFICO */
+.chart-container{
+  width:100%;
+  height:100%;
 }
 
 .retorno-scout{
@@ -171,8 +187,23 @@ html, body{
   .card{ padding:12px; min-height:96vh; }
   .sim-grid{ grid-template-columns:1fr; gap:6px; margin-bottom:6px; }
   .sim-select{ font-size:11px; padding:7px 9px; }
-  .info-card-top{ font-size: 10px; padding: 8px 10px; }
-  .chart-container{ min-height:180px; }
+  
+  /* NO MOBILE O QUADRADO ADAPTA SEU TAMANHO E FONTE */
+  .info-box-left{
+    position: relative;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 8px;
+    font-size: 10px;
+    padding: 8px 10px;
+  }
+  
+  .chart-wrapper{
+    flex-direction: column;
+    min-height: 200px;
+  }
 }
 </style>
 </head>
@@ -220,12 +251,12 @@ html, body{
       </div>
     </div>
 
-    <!-- CONTEÚDO EXPLICATIVO EM DESTAQUE NO TOPO (LOGO ABAIXO DOS SELECTS) -->
-    <div id="infoCardTop" class="info-card-top"></div>
-
-    <!-- GRÁFICO EXPANDIDO -->
-    <div class="chart-container">
-      <canvas id="meuGrafico"></canvas>
+    <!-- WRAPPER DO GRÁFICO COM QUADRADO EXPLICATIVO DESTACADO À ESQUERDA -->
+    <div class="chart-wrapper">
+      <div id="infoBoxLeft" class="info-box-left"></div>
+      <div class="chart-container">
+        <canvas id="meuGrafico"></canvas>
+      </div>
     </div>
 
     <div class="retorno-scout">
@@ -242,7 +273,6 @@ Chart.register(ChartDataLabels);
 
 let chartInstance = null;
 
-// Tabela Oficial com Bônus Evolution (R$ 250) Incluído no Modo Executivo (R$ 1.186,00 na 2ª Etapa)
 const simulacaoOficial = {
   // Modo Executivo (4x450)
   "4_450": [
@@ -271,9 +301,9 @@ const simulacaoOficial = {
 };
 
 const textosExplicativos = {
-  "2": "🌱 <strong>Estratégia do Modo Iniciante (2 Gestores):</strong> Alta facilidade de duplicação. A partir da 3ª etapa, o bônus cobre integralmente as parcelas do cartão da compra inicial e gera lucro líquido crescente, garantindo auto-sustentabilidade imediata.",
-  "3": "🚀 <strong>Estratégia do Modo Expansão (3 Gestores):</strong> Equilíbrio ideal entre duplicação e velocidade. Acelera os ganhos do Unilevel e coloca o gestor na faixa de R$ 3.900 a R$ 13.000 já entre a 3ª e 4ª etapa.",
-  "4": "💼 <strong>Estratégia do Modo Executivo (4 Gestores):</strong> O padrão profissional de máxima performance. Otimiza o Volume Máximo por Linha (VML), garante o Bônus Evolution e PLR acelerados, atingindo graduações de elite (Jaspe e Jade) com menor profundidade de rede."
+  "2": "<strong>🌱 Modo Iniciante (2 Gestores)</strong>Entrada com alta facilidade de duplicação. A partir da 3ª etapa, o bônus cobre integralmente o cartão de crédito da compra inicial e gera lucro líquido crescente com baixo esforço.",
+  "3": "<strong>🚀 Modo Expansão (3 Gestores)</strong>Equilíbrio ideal entre duplicação e velocidade. Acelera os ganhos de Unilevel e alcança a faixa de R$ 3.900 a R$ 13.000 já entre a 3ª e 4ª etapa.",
+  "4": "<strong>💼 Modo Executivo (4 Gestores)</strong>O padrão de máxima performance. Otimiza a pontuação por linha (VML), garante Bônus Evolution e PLR acelerados, atingindo graduações de elite (Jaspe e Jade) com solidez."
 };
 
 function simular(){
@@ -320,8 +350,8 @@ function simular(){
     gcomsList.push(item.gcom);
   });
 
-  // Insere a explicação no topo (antes do gráfico)
-  document.getElementById('infoCardTop').innerHTML = textosExplicativos[d.toString()] || "";
+  // Atualiza o conteúdo dentro da caixa quadrada à esquerda
+  document.getElementById('infoBoxLeft').innerHTML = textosExplicativos[d.toString()] || "";
 
   renderizarGrafico(labels, valoresGanhos, gcomsList);
 }
