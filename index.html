@@ -4,17 +4,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CRC | Simulador Método Executivo</title>
-<meta name="description" content="Simulador CRC de construção de comunidade e relacionamento de consumo baseado no Método Executivo.">
+<title>CRC | Simulador de Comunidades</title>
+<meta name="description" content="Simulador CRC de construção de comunidade e relacionamento de consumo.">
 
-<!-- Tailwind CSS para estilização limpa -->
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Chart.js + Plugin de Rótulos de Dados (DataLabels) -->
+<!-- Chart.js + Plugin DataLabels -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 
 <style>
-/* RESET */
+/* RESET & LAYOUT RESPONSIVO */
 *{ margin:0; padding:0; box-sizing:border-box; }
 
 html, body{
@@ -23,112 +23,107 @@ html, body{
   font-family:Arial,sans-serif;
   background:#050505;
   color:white;
-  overflow:hidden;
+  overflow-x:hidden;
 }
 
-/* APP */
 .app{
   position:relative;
   width:100%;
-  height:100dvh;
-  overflow:hidden;
+  min-height:100dvh;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:12px;
+  padding:8px;
 }
 
-/* OVERLAY */
 .overlay{
   position:absolute;
   inset:0;
   background: linear-gradient(to top, rgba(0,0,0,.95), rgba(0,0,0,.4));
 }
 
-/* CARD CONTAINER PRINCIPAL */
+/* CARD CONTAINER AJUSTADO PARA NÃO CORTAR NO MOBILE */
 .card{
   position:relative;
   z-index:2;
   width:100%;
   max-width:820px;
-  background: rgba(18, 24, 38, 0.90);
+  background: rgba(18, 24, 38, 0.92);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255,255,255,.08);
-  border-radius:24px;
-  padding:20px;
+  border-radius:20px;
+  padding:16px;
   box-shadow: 0 12px 40px rgba(0,0,0,.35);
   display:flex;
   flex-direction:column;
-  height:94vh;
+  min-height:92vh;
 }
 
-/* TEXTO CABEÇALHO */
 .eyebrow{
   font-size:11px;
-  letter-spacing:1.5px;
+  letter-spacing:1px;
   text-transform:uppercase;
   color: rgba(0,255,136,.85);
-  margin-bottom:4px;
+  margin-bottom:2px;
   font-weight: bold;
 }
 
 .title{
-  font-size: clamp(16px,2vw,22px);
+  font-size: clamp(15px,2vw,20px);
   line-height:1.2;
-  margin-bottom:4px;
+  margin-bottom:3px;
   font-weight:600;
 }
 
 .subtitle{
-  font-size: clamp(11px,1vw,13px);
-  line-height:1.4;
+  font-size: clamp(11px,1vw,12px);
+  line-height:1.3;
   color: rgba(255,255,255,.7);
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 
-/* SIMULADOR FILTROS CLAROS PARA LEIGOS */
+/* SELECTS */
 .sim-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-bottom:16px;
+  gap:8px;
+  margin-bottom:12px;
 }
 
 .sim-label{
   display:block;
-  font-size:11px;
+  font-size:10px;
   color:#aaa;
-  margin-bottom:4px;
+  margin-bottom:3px;
   text-align:left;
-  line-height:1.3;
+  line-height:1.2;
 }
 
 .sim-select{
   width:100%;
   background:#080808;
   border: 1px solid #222;
-  border-radius:12px;
-  padding:10px 12px;
+  border-radius:10px;
+  padding:8px 10px;
   color:#00ff88;
   font-weight:bold;
-  font-size:13px;
+  font-size:11px;
   outline:none;
 }
 
-/* GRÁFICO EXPANDIDO (OCUPA O ESPAÇO PRINCIPAL) */
+/* ÁREA DO GRÁFICO COM MARGEM SUPERIOR EXTRA PARA RÓTULOS */
 .chart-container{
   position:relative;
   width:100%;
   flex:1;
-  min-height:260px;
-  margin-bottom:12px;
+  min-height:250px;
+  margin-bottom:8px;
 }
 
-/* RETORNO AO SCOUT */
 .retorno-scout{
   display:flex;
   justify-content:center;
-  padding-top:10px;
+  padding-top:8px;
   border-top:1px solid rgba(255,255,255,0.06);
   flex-shrink:0;
 }
@@ -140,27 +135,23 @@ html, body{
   gap:8px;
   width:100%;
   max-width:420px;
-  min-height:42px;
-  padding:10px 18px;
+  min-height:38px;
+  padding:8px 14px;
   border:1px solid rgba(0,255,136,.35);
-  border-radius:12px;
+  border-radius:10px;
   background:rgba(0,255,136,.08);
   color:#00ff88;
   text-decoration:none;
-  font-size:13px;
+  font-size:12px;
   font-weight:700;
-  transition:all .2s ease;
 }
 
-.retorno-scout a:hover{
-  background:rgba(0,255,136,.14);
-  border-color:rgba(0,255,136,.65);
-}
-
-/* MOBILE RESPONSIVO */
+/* AJUSTES EXCLUSIVOS PARA MOBILE */
 @media(max-width:640px){
-  .card{ padding:14px; height:98vh; }
-  .sim-grid{ grid-template-columns:1fr; gap:8px; margin-bottom:10px; }
+  .app{ padding:4px; }
+  .card{ padding:12px; min-height:96vh; }
+  .sim-grid{ grid-template-columns:1fr; gap:6px; margin-bottom:8px; }
+  .sim-select{ font-size:11px; padding:7px 9px; }
   .chart-container{ min-height:220px; }
 }
 </style>
@@ -173,7 +164,7 @@ html, body{
 
   <div class="card mx-auto">
     <div class="eyebrow">
-      CRC | Método Executivo Oficial
+      CRC | Modelo de Comunidades
     </div>
 
     <h1 class="title">
@@ -181,19 +172,19 @@ html, body{
     </h1>
 
     <p class="subtitle">
-      Projeção baseada na entrada de novos GCom e no consumo recorrente da rede.
+      Projeção baseada em GCom - gestores de comunidade e consumo recorrente.
     </p>
 
-    <!-- FILTROS COM DESCRIÇÃO FACILITADA PARA LEIGOS -->
+    <!-- FILTROS ATUALIZADOS: MODO INICIANTE VS EXECUTIVO -->
     <div class="sim-grid" id="simGrid">
       <div>
         <label class="sim-label">
           Novos GCom (Gestores de Comunidade) por etapa
         </label>
         <select id="gestores" onchange="simular()" class="sim-select">
-          <option value="2">2 Novos Gestores / Etapa</option>
+          <option value="2">2 Novos Gestores / Etapa (Modo Iniciante)</option>
           <option value="3">3 Novos Gestores / Etapa</option>
-          <option value="4" selected>4 Novos Gestores / Etapa (Método Executivo - Recomendado)</option>
+          <option value="4" selected>4 Novos Gestores / Etapa (Modo Executivo - Recomendado)</option>
           <option value="5">5 Novos Gestores / Etapa</option>
         </select>
       </div>
@@ -204,13 +195,13 @@ html, body{
         </label>
         <select id="consumo" onchange="simular()" class="sim-select">
           <option value="300">R$ 300,00</option>
-          <option value="450" selected>R$ 450,00 (Método Executivo - Recomendado)</option>
+          <option value="450" selected>R$ 450,00 (Padrão Executivo)</option>
           <option value="500">R$ 500,00</option>
         </select>
       </div>
     </div>
 
-    <!-- GRÁFICO 100% EXPANDIDO E INTUITIVO -->
+    <!-- GRÁFICO EXPANDIDO COM MARGEM DE SEGURANÇA SUPERIOR -->
     <div class="chart-container">
       <canvas id="meuGrafico"></canvas>
     </div>
@@ -225,19 +216,27 @@ html, body{
 </div>
 
 <script>
-// Registra o plugin de rótulos diretos no Chart.js
 Chart.register(ChartDataLabels);
 
 let chartInstance = null;
 
-// Matriz exata de equivalência da planilha oficial para o Método Executivo
+// Tabela Oficial de Resultados
 const simulacaoOficial = {
+  // Modo Executivo (4x450)
   "4_450": [
     { etapa: 1, gcom: 4, plano: "Executivo", total: 360.00 },
     { etapa: 2, gcom: 24, plano: "Topázio", total: 936.00 },
     { etapa: 3, gcom: 108, plano: "Jaspe", total: 7038.00 },
     { etapa: 4, gcom: 448, plano: "Jade", total: 21240.00 },
     { etapa: 5, gcom: 1812, plano: "Dream Red", total: 68094.00 }
+  ],
+  // Modo Iniciante (2x450)
+  "2_450": [
+    { etapa: 1, gcom: 2, plano: "Executivo", total: 180.00 },
+    { etapa: 2, gcom: 8, plano: "Topázio", total: 378.00 },
+    { etapa: 3, gcom: 22, plano: "Ônix", total: 1060.00 },
+    { etapa: 4, gcom: 52, plano: "Ametista", total: 2210.00 },
+    { etapa: 5, gcom: 114, plano: "Diamante Negro", total: 6552.00 }
   ]
 };
 
@@ -301,7 +300,7 @@ function renderizarGrafico(labels, dadosValores, dadosGcom) {
         label: 'Ganhos (R$)',
         data: dadosValores,
         backgroundColor: '#00ff88',
-        borderRadius: 8,
+        borderRadius: 6,
         barThickness: 'flex'
       }]
     },
@@ -309,7 +308,8 @@ function renderizarGrafico(labels, dadosValores, dadosGcom) {
       responsive: true,
       maintainAspectRatio: false,
       layout: {
-        padding: { top: 30 }
+        // MARGEM SUPERIOR AUMENTADA PARA GARANTIR VISIBILIDADE NO MOBILE
+        padding: { top: 38, left: 5, right: 5, bottom: 5 }
       },
       plugins: {
         legend: { display: false },
@@ -317,9 +317,9 @@ function renderizarGrafico(labels, dadosValores, dadosGcom) {
         datalabels: {
           anchor: 'end',
           align: 'end',
-          offset: 4,
+          offset: 2,
           color: '#00ff88',
-          font: { weight: 'bold', size: 11 },
+          font: { weight: 'bold', size: 10 },
           formatter: function(value, context) {
             const index = context.dataIndex;
             const gcomCount = dadosGcom[index];
@@ -333,14 +333,13 @@ function renderizarGrafico(labels, dadosValores, dadosGcom) {
         y: { display: false, grid: { display: false } },
         x: {
           grid: { display: false },
-          ticks: { color: '#ffffff', font: { size: 11, weight: 'bold' } }
+          ticks: { color: '#ffffff', font: { size: 10, weight: 'bold' } }
         }
       }
     }
   });
 }
 
-// Inicializa o simulador ao carregar a página
 window.onload = simular;
 </script>
 
