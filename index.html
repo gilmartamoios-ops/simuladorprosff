@@ -1,14 +1,16 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CRC | Simulador de Comunidade</title>
-<meta name="description" content="Simulador CRC de construção de comunidade e relacionamento de consumo.">
+<title>CRC | Simulador Método Executivo</title>
+<meta name="description" content="Simulador CRC de construção de comunidade e relacionamento de consumo baseado no Método Executivo.">
 
+<!-- Tailwind CSS para estruturação moderna -->
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Chart.js para renderização de gráficos limpos e de alto impacto cognitivo -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 /* RESET */
@@ -48,7 +50,7 @@ html, body{
   z-index:2;
   width:100%;
   max-width:760px;
-  background: rgba(0,0,0,.25);
+  background: rgba(18, 24, 38, 0.85);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255,255,255,.08);
   border-radius:24px;
@@ -65,12 +67,13 @@ html, body{
   font-size:11px;
   letter-spacing:1.5px;
   text-transform:uppercase;
-  color: rgba(255,255,255,.64);
+  color: rgba(0,255,136,.8);
   margin-bottom:4px;
+  font-weight: bold;
 }
 
 .title{
-  font-size: clamp(16px,2vw,24px);
+  font-size: clamp(16px,2vw,22px);
   line-height:1.2;
   margin-bottom:4px;
   font-weight:600;
@@ -80,7 +83,7 @@ html, body{
   font-size: clamp(11px,1vw,13px);
   line-height:1.4;
   color: rgba(255,255,255,.7);
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 
 /* SIMULADOR FILTROS */
@@ -88,7 +91,7 @@ html, body{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 
 .sim-label{
@@ -108,8 +111,16 @@ html, body{
   padding:8px 12px;
   color:#00ff88;
   font-weight:bold;
-  font-size:14px;
+  font-size:13px;
   outline:none;
+}
+
+/* CONTAINER DO GRÁFICO LIMPO */
+.chart-container{
+  position:relative;
+  width:100%;
+  height:180px;
+  margin-bottom:10px;
 }
 
 /* RESULTADO CONTAINER */
@@ -119,7 +130,7 @@ html, body{
   padding-right:4px;
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:6px;
 }
 
 .resultado::-webkit-scrollbar{ width:4px; }
@@ -129,8 +140,8 @@ html, body{
 .etapa-card{
   background: rgba(255,255,255,.03);
   border: 1px solid rgba(255,255,255,.06);
-  border-radius:14px;
-  padding:10px 14px;
+  border-radius:12px;
+  padding:8px 12px;
   backdrop-filter: blur(10px);
   display:flex;
   justify-content:space-between;
@@ -145,14 +156,15 @@ html, body{
 
 .etapa-num{
   font-size:11px;
-  color:#777;
+  color:#00ff88;
   text-transform:uppercase;
   letter-spacing:1px;
+  font-weight: bold;
 }
 
 .etapa-comunidades{
-  font-size:15px;
-  font-weight:700;
+  font-size:13px;
+  font-weight:600;
   color:#fff;
 }
 
@@ -162,7 +174,7 @@ html, body{
 }
 
 .etapa-valor{
-  font-size:20px;
+  font-size:17px;
   font-weight:700;
   color:#00ff88;
   text-align:right;
@@ -172,8 +184,8 @@ html, body{
 .retorno-scout{
   display:flex;
   justify-content:center;
-  padding-top:12px;
-  margin-top:4px;
+  padding-top:8px;
+  margin-top:2px;
   flex-shrink:0;
 }
 
@@ -184,14 +196,14 @@ html, body{
   gap:8px;
   width:100%;
   max-width:420px;
-  min-height:44px;
-  padding:10px 18px;
+  min-height:40px;
+  padding:8px 16px;
   border:1px solid rgba(0,255,136,.35);
   border-radius:12px;
   background:rgba(0,255,136,.08);
   color:#00ff88;
   text-decoration:none;
-  font-size:14px;
+  font-size:13px;
   font-weight:700;
   transition:all .2s ease;
 }
@@ -199,16 +211,16 @@ html, body{
 .retorno-scout a:hover{
   background:rgba(0,255,136,.14);
   border-color:rgba(0,255,136,.65);
-  transform:translateY(-1px);
 }
 
 /* MOBILE RESPONSIVO */
 @media(max-width:640px){
-  .card{ padding:12px; }
-  .sim-grid{ grid-template-columns:1fr; gap:8px; }
-  .etapa-card{ padding:8px 10px; }
-  .etapa-comunidades{ font-size:13px; }
-  .etapa-valor{ font-size:17px; }
+  .card{ padding:10px; max-height:98vh; }
+  .sim-grid{ grid-template-columns:1fr; gap:6px; margin-bottom:6px; }
+  .chart-container{ height:150px; }
+  .etapa-card{ padding:6px 10px; }
+  .etapa-comunidades{ font-size:12px; }
+  .etapa-valor{ font-size:15px; }
 }
 </style>
 </head>
@@ -220,50 +232,48 @@ html, body{
 
   <div class="card mx-auto">
     <div class="eyebrow">
-      Simulador CRC | Modelo de Comunidades
+      CRC | Método Executivo Oficial
     </div>
 
     <h1 class="title">
-      Simule a expansão da sua comunidade
+      Simulação de Expansão da Comunidade
     </h1>
 
     <p class="subtitle">
-      Baseado na expansão de núcleos e no consumo recorrente do modelo CRC.
+      Projeção baseada em GCom - gestores de comunidade e consumo recorrente.
     </p>
 
+    <!-- FILTROS DE ENTRADA -->
     <div class="sim-grid" id="simGrid">
       <div>
         <label class="sim-label">
-          gestores por comunidade
+          GCom - gestores de comunidade (por núcleo)
         </label>
         <select id="gestores" onchange="simular()" class="sim-select">
-          <option value="3" selected>3 gestores</option>
-          <option value="4">4 gestores</option>
-          <option value="5">5 gestores</option>
-          <option value="6">6 gestores</option>
-          <option value="7">7 gestores</option>
-          <option value="8">8 gestores</option>
-          <option value="9">9 gestores</option>
-          <option value="10">10 gestores</option>
+          <option value="3">3 Gestores (Livre)</option>
+          <option value="4" selected>4 Gestores (Método Executivo - Recomendado)</option>
+          <option value="5">5 Gestores (Acelerado)</option>
         </select>
       </div>
 
       <div>
         <label class="sim-label">
-          Consumo mínimo mensal da comunidade
+          consumo recorrente mensal
         </label>
         <select id="consumo" onchange="simular()" class="sim-select">
-          <option value="300" selected>R$ 300</option>
-          <option value="350">R$ 350</option>
-          <option value="400">R$ 400</option>
-          <option value="450">R$ 450</option>
-          <option value="500">R$ 500</option>
-          <option value="550">R$ 550</option>
-          <option value="600">R$ 600</option>
+          <option value="300">R$ 300,00</option>
+          <option value="450" selected>R$ 450,00 (Padrão Executivo)</option>
+          <option value="500">R$ 500,00</option>
         </select>
       </div>
     </div>
 
+    <!-- GRÁFICO LIMPO (SEM POLUIÇÃO DE EIXOS OU LINHAS) -->
+    <div class="chart-container">
+      <canvas id="meuGrafico"></canvas>
+    </div>
+
+    <!-- LISTAGEM DETALHADA POR ETAPA -->
     <div id="resultado" class="resultado"></div>
 
     <div class="retorno-scout">
@@ -276,96 +286,136 @@ html, body{
 </div>
 
 <script>
+let chartInstance = null;
+
+const carreira = [
+  { nome: 'Executivo', pts: 0, plr: 0 },
+  { nome: 'Topázio', pts: 2000, plr: 0 },
+  { nome: 'Ônix', pts: 10000, plr: 0 },
+  { nome: 'Ametista', pts: 20000, plr: 0 },
+  { nome: 'Diamante Negro', pts: 35000, plr: 0.06 },
+  { nome: 'Jaspe', pts: 70000, plr: 0.05 },
+  { nome: 'Jade', pts: 140000, plr: 0.04 },
+  { nome: 'Royal Black', pts: 300000, plr: 0.04 },
+  { nome: 'Dream Red', pts: 750000, plr: 0.03 },
+  { nome: 'Master Gold', pts: 2000000, plr: 0.02 }
+];
+
 function simular(){
-  const gestoresPorComunidade = parseInt(document.getElementById('gestores').value);
-  const consumo = parseInt(document.getElementById('consumo').value);
+  const gcomPorNucleo = parseInt(document.getElementById('gestores').value);
+  const consumoRecorrente = parseFloat(document.getElementById('consumo').value);
 
-  const percentuais = [0.05, 0.05, 0.045, 0.04, 0.0275, 0.02, 0.005];
-
-  const niveis = [
-    { nome:'Empreendedor', pontos:950, pin:100 },
-    { nome:'Senior', pontos:2450, pin:200 },
-    { nome:'Expert', pontos:7250, pin:700 },
-    { nome:'Enterprise', pontos:14750, pin:1300 },
-    { nome:'Diamond', pontos:27500, pin:4000 },
-    { nome:'Diamond Expert', pontos:60000, pin:12000 },
-    { nome:'Diamond Global', pontos:122500, pin:24000 },
-    { nome:'Empresarial Diamond', pontos:247500, pin:34000 },
-    { nome:'Imperial Bonific', pontos:495000, pin:60000 },
-    { nome:'Majestic Bonific', pontos:1475000, pin:130000 },
-    { nome:'Presidencial', pontos:3000000, pin:250000 }
-  ];
-
+  const labels = [];
+  const valoresGanhos = [];
   let html = '';
   let camadas = [];
   let pessoasAtivas = 0;
-  let saldoPontos = 0;
-  let debitoMesSeguinte = 0;
 
-  for(let etapa = 1; etapa <= 6; etapa++){
-    saldoPontos -= debitoMesSeguinte;
-    if(saldoPontos < 0) saldoPontos = 0;
-    debitoMesSeguinte = 0;
-
-    const novaCamadaPessoas = Math.pow(gestoresPorComunidade, etapa);
+  for(let etapa = 1; etapa <= 5; etapa++){
+    const novaCamadaPessoas = Math.pow(gcomPorNucleo, etapa);
     camadas.push(novaCamadaPessoas);
     pessoasAtivas += novaCamadaPessoas;
 
-    const numeroComunidades = pessoasAtivas / gestoresPorComunidade;
+    const numeroComunidades = pessoasAtivas / gcomPorNucleo;
 
-    const pontosMes = novaCamadaPessoas * (consumo / 300) * 100;
+    // Faturamento e Pontos
+    const faturamAtiv = novaCamadaPessoas * consumoRecorrente;
+    let faturamRecompra = 0;
+    for(let i = 1; i < etapa; i++){
+      faturamRecompra += Math.pow(gcomPorNucleo, i) * consumoRecorrente;
+    }
+    const pontosTotais = faturamAtiv + faturamRecompra;
 
-    let bonus30D = 0;
-    if(etapa > 1){
-      const pontosMesAnterior = camadas[etapa - 2] * (consumo / 300) * 100;
-      if(pontosMes >= (pontosMesAnterior * 0.5)){
-        bonus30D = pontosMesAnterior;
+    // Qualificação
+    let qualif = 'Executivo';
+    let plrPerc = 0;
+    for(let c of carreira){
+      if(pontosTotais >= c.pts){
+        qualif = c.nome;
+        plrPerc = c.plr;
       }
     }
 
-    saldoPontos += pontosMes + bonus30D;
+    // Bônus Unilevel
+    const percAtiv = [0.20, 0.05, 0.05, 0.05, 0.05];
+    const percCons = [0.12, 0.08, 0.08, 0.04, 0.04, 0.04, 0.06, 0.06, 0.08];
 
-    let bonusPin = 0;
-    for(let nivel of niveis){
-      if(saldoPontos >= nivel.pontos){
-        bonusPin = nivel.pin;
-        debitoMesSeguinte = nivel.pontos;
-      }
+    let bAtiv = etapa <= 5 ? (novaCamadaPessoas * consumoRecorrente) * percAtiv[etapa - 1] : 0;
+    let bCons = 0;
+    for(let i = 1; i < etapa; i++){
+      bCons += (Math.pow(gcomPorNucleo, i) * consumoRecorrente) * percCons[i - 1];
     }
 
-    let bonusUnilevel = 0;
-    camadas.forEach((camada, index) => {
-      if(percentuais[index]){
-        bonusUnilevel += (camada * consumo) * percentuais[index];
-      }
-    });
+    let bPLR = pontosTotais * plrPerc;
+    let bEvolution = (qualif === 'Ônix') ? 250 : (qualif === 'Ametista' ? 500 : 0);
 
-    const bonusEstimado = bonusUnilevel + bonusPin;
+    const totalGanho = bAtiv + bCons + bPLR + bEvolution;
 
-    const nomeQualificacao = bonusPin > 0
-      ? (niveis.find(n => n.pin === bonusPin)?.nome || 'Em evolução')
-      : 'Em construção';
+    labels.push(`${etapa}ª Etapa\n(${qualif})`);
+    valoresGanhos.push(totalGanho);
 
     html += `
     <div class="etapa-card">
       <div class="etapa-info-left">
-        <span class="etapa-num">${etapa}ª Etapa</span>
-        <span class="etapa-comunidades">${numeroComunidades.toLocaleString('pt-BR')} comunidades</span>
-        <span class="etapa-qualificacao">Qualificação: <b style="color:#fff">${nomeQualificacao}</b></span>
+        <span class="etapa-num">${etapa}ª Etapa — ${qualif}</span>
+        <span class="etapa-comunidades">${Math.round(numeroComunidades).toLocaleString('pt-BR')} comunidades (${pessoasAtivas.toLocaleString('pt-BR')} GCom)</span>
       </div>
       <div class="etapa-valor">
-        R$ ${bonusEstimado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        R$ ${totalGanho.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </div>
     </div>
     `;
   }
 
   document.getElementById('resultado').innerHTML = html;
+  renderizarGrafico(labels, valoresGanhos);
 }
 
-simular();
+function renderizarGrafico(labels, dados) {
+  const ctx = document.getElementById('meuGrafico').getContext('2d');
+  
+  if (chartInstance) chartInstance.destroy();
+
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Ganhos Estimados (R$)',
+        data: dados,
+        backgroundColor: '#00ff88',
+        borderRadius: 6,
+        barThickness: 'flex'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return ' Ganhos: R$ ' + context.raw.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+            }
+          }
+        }
+      },
+      scales: {
+        // Eixos completamente limpos sem poluição visual
+        y: { display: false, grid: { display: false } },
+        x: {
+          grid: { display: false },
+          ticks: { color: '#ffffff', font: { size: 10, weight: 'bold' } }
+        }
+      }
+    }
+  });
+}
+
+// Inicializa a simulação ao carregar
+window.onload = simular;
 </script>
 
 </body>
 </html>
-
