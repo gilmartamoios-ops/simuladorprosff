@@ -87,7 +87,7 @@ html, body{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px;
-  margin-bottom:10px;
+  margin-bottom:8px;
 }
 
 .sim-label{
@@ -111,29 +111,32 @@ html, body{
   outline:none;
 }
 
-/* ÁREA DO GRÁFICO COM MARGEM SUPERIOR EXTRA */
+/* CARD EXPLICATIVO EM DESTAQUE - NO TOPO ANTES DO GRÁFICO */
+.info-card-top{
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px solid rgba(0, 255, 136, 0.35);
+  border-left: 4px solid #00ff88;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #f1f5f9;
+  box-shadow: 0 4px 15px rgba(0,255,136,0.05);
+}
+
+.info-card-top strong{
+  color: #00ff88;
+  font-size: 12px;
+}
+
+/* ÁREA DO GRÁFICO EXPANDIDO */
 .chart-container{
   position:relative;
   width:100%;
   flex:1;
-  min-height:220px;
+  min-height:210px;
   margin-bottom:8px;
-}
-
-/* CARD EXPLICATIVO DINÂMICO DO RESULTADO */
-.info-card{
-  background: rgba(0, 255, 136, 0.05);
-  border: 1px solid rgba(0, 255, 136, 0.2);
-  border-radius: 12px;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  font-size: 11px;
-  line-height: 1.4;
-  color: #e2e8f0;
-}
-
-.info-card strong{
-  color: #00ff88;
 }
 
 .retorno-scout{
@@ -166,9 +169,10 @@ html, body{
 @media(max-width:640px){
   .app{ padding:4px; }
   .card{ padding:12px; min-height:96vh; }
-  .sim-grid{ grid-template-columns:1fr; gap:6px; margin-bottom:8px; }
+  .sim-grid{ grid-template-columns:1fr; gap:6px; margin-bottom:6px; }
   .sim-select{ font-size:11px; padding:7px 9px; }
-  .chart-container{ min-height:190px; }
+  .info-card-top{ font-size: 10px; padding: 8px 10px; }
+  .chart-container{ min-height:180px; }
 }
 </style>
 </head>
@@ -191,7 +195,7 @@ html, body{
       Projeção baseada em GCom - gestores de comunidade e consumo recorrente.
     </p>
 
-    <!-- FILTROS: APENAS 3 MODELOS (INICIANTE, EXANSAO, EXECUTIVO) -->
+    <!-- FILTROS COM OS 3 MODELOS -->
     <div class="sim-grid" id="simGrid">
       <div>
         <label class="sim-label">
@@ -216,13 +220,13 @@ html, body{
       </div>
     </div>
 
+    <!-- CONTEÚDO EXPLICATIVO EM DESTAQUE NO TOPO (LOGO ABAIXO DOS SELECTS) -->
+    <div id="infoCardTop" class="info-card-top"></div>
+
     <!-- GRÁFICO EXPANDIDO -->
     <div class="chart-container">
       <canvas id="meuGrafico"></canvas>
     </div>
-
-    <!-- CARACTERÍSTICA DO RESULTADO SELECIONADO -->
-    <div id="infoCard" class="info-card"></div>
 
     <div class="retorno-scout">
       <a href="https://crc-scout.vercel.app/?etapa=quiz">
@@ -243,7 +247,7 @@ const simulacaoOficial = {
   // Modo Executivo (4x450)
   "4_450": [
     { etapa: 1, gcom: 4, plano: "Executivo", total: 360.00 },
-    { etapa: 2, gcom: 24, plano: "Ônix", total: 1186.00 }, // Inclui R$ 250 de Bônus Evolution!
+    { etapa: 2, gcom: 24, plano: "Ônix", total: 1186.00 },
     { etapa: 3, gcom: 108, plano: "Jaspe", total: 7038.00 },
     { etapa: 4, gcom: 448, plano: "Jade", total: 21240.00 },
     { etapa: 5, gcom: 1812, plano: "Dream Red", total: 68094.00 }
@@ -260,16 +264,16 @@ const simulacaoOficial = {
   "2_450": [
     { etapa: 1, gcom: 2, plano: "Executivo", total: 180.00 },
     { etapa: 2, gcom: 8, plano: "Topázio", total: 378.00 },
-    { etapa: 3, gcom: 22, plano: "Ônix", total: 1310.00 }, // Inclui R$ 250 de Bônus Evolution
+    { etapa: 3, gcom: 22, plano: "Ônix", total: 1310.00 },
     { etapa: 4, gcom: 52, plano: "Ametista", total: 2710.00 },
     { etapa: 5, gcom: 114, plano: "Diamante Negro", total: 6552.00 }
   ]
 };
 
 const textosExplicativos = {
-  "2": "🌱 <strong>Característica do Modo Iniciante (2 Gestores):</strong> Modelo de entrada com altíssima facilidade de duplicação. A partir da 3ª etapa, o bônus gerado cobre integralmente as parcelas do kit inicial no cartão de crédito e gera lucro líquido crescente com baixo esforço de recrutamento.",
-  "3": "🚀 <strong>Característica do Modo Expansão (3 Gestores):</strong> Ritmo equilibrado de transição para liderança de comunidade. Acelera os ganhos de Unilevel e atinge a faixa de R$ 3.900,00 a R$ 13.000,00 com rápida formação de núcleo.",
-  "4": "💼 <strong>Característica do Modo Executivo (4 Gestores):</strong> O padrão profissional de máxima performance. Otimiza a pontuação por linha (VML), garante o Bônus Evolution e PLR acelerados, atingindo graduações de elite (Jaspe e Jade) com solidez de rede."
+  "2": "🌱 <strong>Estratégia do Modo Iniciante (2 Gestores):</strong> Alta facilidade de duplicação. A partir da 3ª etapa, o bônus cobre integralmente as parcelas do cartão da compra inicial e gera lucro líquido crescente, garantindo auto-sustentabilidade imediata.",
+  "3": "🚀 <strong>Estratégia do Modo Expansão (3 Gestores):</strong> Equilíbrio ideal entre duplicação e velocidade. Acelera os ganhos do Unilevel e coloca o gestor na faixa de R$ 3.900 a R$ 13.000 já entre a 3ª e 4ª etapa.",
+  "4": "💼 <strong>Estratégia do Modo Executivo (4 Gestores):</strong> O padrão profissional de máxima performance. Otimiza o Volume Máximo por Linha (VML), garante o Bônus Evolution e PLR acelerados, atingindo graduações de elite (Jaspe e Jade) com menor profundidade de rede."
 };
 
 function simular(){
@@ -282,7 +286,6 @@ function simular(){
   if(simulacaoOficial[key]){
     dadosEtapas = simulacaoOficial[key];
   } else {
-    // Cálculo de aproximação
     let gcomAcum = 0;
     for(let e = 1; e <= 5; e++){
       let novos = Math.pow(d, e);
@@ -317,8 +320,8 @@ function simular(){
     gcomsList.push(item.gcom);
   });
 
-  // Atualiza texto explicativo
-  document.getElementById('infoCard').innerHTML = textosExplicativos[d.toString()] || "";
+  // Insere a explicação no topo (antes do gráfico)
+  document.getElementById('infoCardTop').innerHTML = textosExplicativos[d.toString()] || "";
 
   renderizarGrafico(labels, valoresGanhos, gcomsList);
 }
