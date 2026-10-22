@@ -63,7 +63,7 @@ html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#0
     
     <div class="header-box">
       <div class="eyebrow">CRC | PAINEL DE ALOCAÇÃO DE EQUIPES & DIAGNÓSTICO DE VML</div>
-      <h1 class="title">Mapa Aritmético Individual por Linha (L1 a L30)</h1>
+      <h1 class="title">Mapa Aritmético Individual por Linha</h1>
       <p class="subtitle">Identifique exatamente a produção de cada linha para saber onde direcionar novos cadastros do SCOUT.</p>
 
       <!-- CAIXAS DE DIÁLOGO / SELETORES PADRÃO SCOUT -->
@@ -72,16 +72,16 @@ html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#0
           <label class="sim-label">Novas Linhas por Etapa</label>
           <select id="gestores" onchange="calcularEExibir()" class="sim-select">
             <option value="2">2 Novos Gestores / Etapa (Modo Iniciante)</option>
-            <option value="3" selected>3 Novos Gestores / Etapa (Modo Expansão CRC)</option>
-            <option value="4">4 Novos Gestores / Etapa (Modo Executivo)</option>
+            <option value="3">3 Novos Gestores / Etapa (Modo Expansão CRC)</option>
+            <option value="4" selected>4 Novos Gestores / Etapa (Modo Executivo)</option>
           </select>
         </div>
         <div>
           <label class="sim-label">Consumo Recorrente Mensal da Comunidade</label>
           <select id="consumo" onchange="calcularEExibir()" class="sim-select">
-            <option value="300" selected>R$ 300,00</option>
+            <option value="300">R$ 300,00</option>
             <option value="450">R$ 450,00 (Padrão Executivo - Recomendado)</option>
-            <option value="500">R$ 500,00</option>
+            <option value="500" selected>R$ 500,00</option>
           </select>
         </div>
       </div>
@@ -104,10 +104,10 @@ const carreirasMap4x4 = [
   "Royal Black", "Master Gold", "Master Gold", "Master Gold", "Master Gold (Topo)"
 ];
 
-// Bases oficiais de Pontos Totais da Planilha do Gilmar (para base 450)
-const base450_3x = [1350, 6750, 36450, 90450, 253800, 745200, 2220750, 6648750, 19934100, 33219450];
-const base450_4x = [1800, 10800, 77400, 230400, 844200, 3301200, 13131000, 52452000, 157356000, 262260000];
-const base450_2x = [900, 4500, 24300, 60300, 169200, 496800, 1480500, 4432500, 13289400, 22146300];
+// GComs Totais Exatos por Etapa extraídos rigorosamente da Planilha Oficial
+const gcomsOficiais_4x = [4, 24, 108, 448, 1812, 7272, 29116, 116496, 466020, 815544];
+const gcomsOficiais_3x = [3, 15, 54, 174, 537, 1629, 4908, 14748, 44271, 73800];
+const gcomsOficiais_2x = [2, 8, 22, 52, 114, 240, 500, 1020, 2080, 4200];
 
 function calcularEExibir() {
   const d = parseInt(document.getElementById('gestores').value);
@@ -116,15 +116,16 @@ function calcularEExibir() {
   container.innerHTML = '';
 
   const carreiras = d === 4 ? carreirasMap4x4 : carreirasMap3x3;
-  const baseEscolhida = d === 4 ? base450_4x : (d === 3 ? base450_3x : base450_2x);
+  const listaGcomsBase = d === 4 ? gcomsOficiais_4x : (d === 3 ? gcomsOficiais_3x : gcomsOficiais_2x);
 
   for (let e = 1; e <= 10; e++) {
     const totalLinhasEtapa = e * d;
+    const gcomTotalEtapa = listaGcomsBase[e - 1];
     
-    // Cálculo exato do total da etapa proporcional ao consumo escolhido (c / 450)
-    const totalPontosEtapaOficial = Math.round(baseEscolhida[e-1] * (c / 450));
+    // Consumo Total da Etapa = GComs Totais da Planilha x Consumo Selecionado
+    const totalConsumoEtapaOficial = gcomTotalEtapa * c;
 
-    // Distribuição ponderada exata por profundidade geométrica entre as linhas da etapa
+    // Cálculo dos Pesos Ponderados Geométricos de cada Linha por Profundidade
     let pesosLinhas = [];
     let somaPesos = 0;
 
@@ -142,10 +143,10 @@ function calcularEExibir() {
     pesosLinhas.forEach((item, idx) => {
       let volumeLinha = 0;
       if (idx === pesosLinhas.length - 1) {
-        // Ajuste de centavos na última linha para garantir igualdade exata com o total da etapa
-        volumeLinha = totalPontosEtapaOficial - somaVerificacao;
+        // Fechamento exato na última linha para bater 100% com o total da etapa sem dízimas
+        volumeLinha = totalConsumoEtapaOficial - somaVerificacao;
       } else {
-        volumeLinha = Math.round(totalPontosEtapaOficial * (item.peso / somaPesos));
+        volumeLinha = Math.round(totalConsumoEtapaOficial * (item.peso / somaPesos));
         somaVerificacao += volumeLinha;
       }
 
@@ -170,11 +171,14 @@ function calcularEExibir() {
             <span style="background:rgba(0,255,136,0.1); color:#00ff88; border:1px solid rgba(0,255,136,0.3); padding:3px 10px; border-radius:12px; font-size:11px; margin-left:10px; font-weight:bold;">
               ${carreiras[e-1]}
             </span>
+            <span style="color:#aaa; font-size:12px; margin-left:12px;">
+              (${gcomTotalEtapa.toLocaleString('pt-BR')} GComs Totais)
+            </span>
           </div>
           <div style="text-align:right;">
             <span style="color:#aaa; font-size:12px;">Total Oficial da Etapa (${totalLinhasEtapa} Linhas):</span>
             <strong style="color:#00ff88; font-size:18px; font-family:monospace; margin-left:8px;">
-              R$ ${totalPontosEtapaOficial.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+              R$ ${totalConsumoEtapaOficial.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
             </strong>
           </div>
         </div>
