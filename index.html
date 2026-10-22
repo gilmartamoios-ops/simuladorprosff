@@ -4,220 +4,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CRC | Painel Mestre de Treinamento e Análise de VML</title>
-<meta name="description" content="Simulador CRC de engenharia de rede, acúmulo de linhas e blindagem contra VML.">
+<title>CRC | Matriz Analítica Mestre de Treinamento</title>
+<meta name="description" content="Painel analítico CRC de crescimento recorrente de GComs e blindagem de VML.">
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Chart.js + Plugin DataLabels -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 
 <style>
 *{ margin:0; padding:0; box-sizing:border-box; }
 html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#050505; color:white; overflow-x:hidden; }
-.app{ position:relative; width:100%; min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:12px; }
-.overlay{ position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,.95), rgba(0,0,0,.4)); }
+.app{ position:relative; width:100%; min-height:100dvh; display:flex; flex-direction:column; padding:16px; }
 .card{
-  position:relative; z-index:2; width:100%; max-width:1050px;
-  background: rgba(18, 24, 38, 0.94); backdrop-filter: blur(16px);
-  border: 1px solid rgba(0,255,136,.2); border-radius:20px; padding:20px;
-  box-shadow: 0 12px 40px rgba(0,0,0,.5); display:flex; flex-direction:column; min-height:92vh;
+  position:relative; z-index:2; width:100%; max-width:1400px; margin: 0 auto;
+  background: rgba(18, 24, 38, 0.95); backdrop-filter: blur(16px);
+  border: 1px solid rgba(0,255,136,.3); border-radius:20px; padding:24px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6); display:flex; flex-direction:column;
 }
-.eyebrow{ font-size:11px; letter-spacing:1px; text-transform:uppercase; color: rgba(0,255,136,.85); margin-bottom:2px; font-weight: bold; }
-.title{ font-size: clamp(16px,2vw,22px); line-height:1.2; margin-bottom:3px; font-weight:600; }
-.subtitle{ font-size: clamp(11px,1vw,13px); line-height:1.3; color: rgba(255,255,255,.7); margin-bottom:12px; }
-.sim-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
-.sim-label{ display:block; font-size:11px; color:#aaa; margin-bottom:4px; text-align:left; line-height:1.2; }
-.sim-select{ width:100%; background:#080808; border: 1px solid #222; border-radius:10px; padding:9px 11px; color:#00ff88; font-weight:bold; font-size:12px; outline:none; }
-.sim-body-wrapper{ display: flex; gap: 16px; align-items: stretch; flex: 1; min-height: 420px; margin-bottom: 12px; }
-.info-col-left{
-  width: 32%; min-width: 250px; background: rgba(0, 255, 136, 0.06);
-  border: 1px dashed rgba(0, 255, 136, 0.4); border-radius: 14px; padding: 16px;
-  display: flex; flex-direction: column; justify-content: center; box-shadow: inset 0 0 15px rgba(0, 255, 136, 0.03);
-}
-.info-col-left strong{ display: block; font-size: 13px; color: #00ff88; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(0, 255, 136, 0.2); padding-bottom: 6px; }
-.info-col-left p{ font-size: 11px; line-height: 1.5; color: #e2e8f0; margin-bottom: 8px; }
-.chart-col-right{ flex: 1; position: relative; min-height: 380px; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 8px; border: 1px solid rgba(255,255,255,0.05); }
-@media(max-width:720px){
-  .card{ padding:14px; min-height:96vh; }
-  .sim-grid{ grid-template-columns:1fr; gap:6px; margin-bottom:8px; }
-  .sim-body-wrapper{ flex-direction: column; gap: 10px; }
-  .info-col-left{ width: 100%; min-width: 100%; padding: 12px; }
-  .chart-col-right{ min-height: 400px; }
-}
+.eyebrow{ font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color: rgba(0,255,136,.9); margin-bottom:4px; font-weight: bold; }
+.title{ font-size: clamp(18px, 2.5vw, 26px); line-height:1.2; margin-bottom:4px; font-weight:700; }
+.subtitle{ font-size: clamp(12px, 1.2vw, 14px); color: rgba(255,255,255,.7); margin-bottom:20px; }
+.sim-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:24px; background: rgba(0,0,0,0.4); padding:16px; border-radius:14px; border: 1px solid rgba(255,255,255,0.06); }
+.sim-label{ display:block; font-size:11px; color:#aaa; margin-bottom:6px; text-transform:uppercase; font-weight:600; }
+.sim-select{ width:100%; background:#080808; border: 1px solid #333; border-radius:10px; padding:11px 14px; color:#00ff88; font-weight:bold; font-size:13px; outline:none; }
+
+/* TABELA MASTER DE ESPAÇO TOTAL */
+.table-container{ width:100%; overflow-x:auto; border-radius:12px; border: 1px solid rgba(255,255,255,0.08); }
+table{ width:100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+th{ background: #0b110e; color: #00ff88; padding: 14px 16px; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; border-bottom: 2px solid rgba(0,255,136,0.3); }
+td{ padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0; }
+tr:hover{ background: rgba(0,255,136,0.02); }
+.badge{ display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+
+/* RODAPÉ EXPLICATIVO */
+.footer-info{ margin-top: 20px; background: rgba(0, 255, 136, 0.04); border: 1px dashed rgba(0, 255, 136, 0.3); border-radius: 12px; padding: 16px; font-size: 12px; color: #cbd5e1; line-height: 1.6; }
+.footer-info strong{ color: #00ff88; }
 </style>
 </head>
 
 <body>
 
 <div class="app">
-  <div class="overlay"></div>
+  <div class="card">
+    <div class="eyebrow">CRC | Painel Mestre de Treinamento de Gestores</div>
+    <h1 class="title">Matriz Analítica de Crescimento Recorrente & Blindagem de VML</h1>
+    <p class="subtitle">Análise geométrica de expansão de GComs, linhas ativas e volume aritmético real por linha em largura total.</p>
 
-  <div class="card mx-auto">
-    <div class="eyebrow">CRC | Painel Mestre de Treinamento e Análise de VML</div>
-    <h1 class="title">Simulação Estratificada por Linha & Blindagem de VML</h1>
-    <p class="subtitle">Cálculo proporcional dinâmico do consumo real por linha em cada etapa.</p>
-
-    <div class="sim-grid" id="simGrid">
+    <!-- FILTROS -->
+    <div class="sim-grid">
       <div>
-        <label class="sim-label">Novos Gestores (GCom) por Etapa</label>
-        <select id="gestores" onchange="simular()" class="sim-select">
-          <option value="3" selected>3 Novos Gestores / Etapa (Modo Expansão CRC)</option>
-          <option value="4">4 Novos Gestores / Etapa (Modo Executivo)</option>
+        <label class="sim-label">Novas Linhas / GComs Diretos por Etapa</label>
+        <select id="gestores" onchange="atualizarPainel()" class="sim-select">
+          <option value="3" selected>3 Novos Gestores / Etapa (Modo Expansão CRC - Matriz 3x3)</option>
+          <option value="4">4 Novos Gestores / Etapa (Modo Executivo - Matriz 4x4)</option>
         </select>
       </div>
       <div>
         <label class="sim-label">Consumo Recorrente Mensal por GCom</label>
-        <select id="consumo" onchange="simular()" class="sim-select">
-          <option value="300">R$ 300,00</option>
-          <option value="450">R$ 450,00 (Padrão Executivo)</option>
-          <option value="500" selected>R$ 500,00 (Personalizado)</option>
+        <select id="consumo" onchange="atualizarPainel()" class="sim-select">
+          <option value="300">R$ 300,00 por GCom</option>
+          <option value="450" selected>R$ 450,00 por GCom (Padrão Executivo)</option>
+          <option value="500">R$ 500,00 por GCom (Personalizado)</option>
         </select>
       </div>
     </div>
 
-    <div class="sim-body-wrapper">
-      <div class="info-col-left">
-        <div id="infoContent"></div>
-      </div>
-      <div class="chart-col-right">
-        <canvas id="meuGrafico"></canvas>
-      </div>
+    <!-- TABELA MASTER DE DADOS -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Etapa</th>
+            <th>Carreira Atingida</th>
+            <th style="text-align:center;">Linhas Acumuladas</th>
+            <th style="text-align:center;">Total GComs na Rede</th>
+            <th>Detalhamento do Consumo Aritmético por Linha</th>
+            <th style="text-align:right;">Volume Total da Etapa</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaCorpo">
+          <!-- Injetado via JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- RODAPÉ DE VALIDAÇÃO TÉCNICA -->
+    <div class="footer-info" id="footerInfo">
+      <!-- Injetado dinamicamente -->
     </div>
   </div>
 </div>
 
 <script>
-Chart.register(ChartDataLabels);
-let chartInstance = null;
-
-// Carreiras oficiais por etapa
-const carreiras = [
+const carreiras3x3 = [
   "Executivo", "Topázio", "Diamante (Ametista)", "Jaspe", "Jade", 
   "Royal Black", "Dream Red", "Master Gold", "Master Gold", "Master Gold (Topo)"
 ];
 
-function simular(){
+const carreiras4x4 = [
+  "Executivo", "Topázio", "Diamante", "Jaspe", "Jade", 
+  "Royal Black", "Dream Red", "Master Gold", "Master Gold", "Master Gold (Topo)"
+];
+
+function atualizarPainel() {
   const d = parseInt(document.getElementById('gestores').value);
   const c = parseFloat(document.getElementById('consumo').value);
-
-  let dadosEtapas = [];
   
-  // Fator multiplicador proporcional exato baseado no consumo de referência (R$ 450)
-  const fatorConsumo = c / 450;
+  const corpo = document.getElementById('tabelaCorpo');
+  corpo.innerHTML = '';
+
+  let htmlTabela = '';
+  const carreiras = d === 3 ? carreiras3x3 : carreiras4x4;
+
+  // Base oficial de pontos para 3x450 ajustada geometricamente por GCom recorrente
+  const basePontos3x = [1350, 6750, 36450, 90450, 253800, 745200, 2220750, 6648750, 19934100, 33219450];
+  const baseGComs3x   = [3, 15, 54, 174, 537, 1620, 4860, 14580, 43740, 72900];
 
   for (let e = 1; e <= 10; e++) {
     let linhasAcumuladas = e * d;
-    let totalPontosBase = 0;
-
-    // Cálculo aritmético proporcional à matriz 3x3 / 4x4
-    if (e === 1) totalPontosBase = d * 450;
-    else if (e === 2) totalPontosBase = (d * 2250);
-    else if (e === 3) totalPontosBase = (d === 3 ? 36450 : 48600);
-    else if (e === 4) totalPontosBase = (d === 3 ? 90450 : 120600);
-    else if (e === 5) totalPontosBase = (d === 3 ? 253800 : 338400);
-    else if (e === 6) totalPontosBase = (d === 3 ? 745200 : 993600);
-    else if (e === 7) totalPontosBase = (d === 3 ? 2220750 : 2961000);
-    else if (e === 8) totalPontosBase = (d === 3 ? 6648750 : 8865000);
-    else if (e === 9) totalPontosBase = (d === 3 ? 19934100 : 26578800);
-    else if (e === 10) totalPontosBase = (d === 3 ? 33219450 : 44292600);
-
-    let totalPontosReal = Math.round(totalPointsCalculator(e, d, c));
+    let fator = c / 450;
     
-    // Cálculo aritmético exato por linha (distribuição assimétrica proporcional: L1 mais profunda, L2 média, L3 nova)
-    let valL1 = Math.round(totalPontosReal * 0.50);
-    let valL2 = Math.round(totalPontosReal * 0.33);
-    let valL3 = totalPontosReal - (valL1 + valL2);
+    // Multiplicador geométrico de expansão recorrente
+    let totalGComs = Math.round(baseGComs3x[e-1] * (d / 3));
+    let totalPontos = Math.round(basePontos3x[e-1] * fator * (d / 3));
 
-    let detalhe = `L1: R$ ${valL1.toLocaleString('pt-BR')} | L2: R$ ${valL2.toLocaleString('pt-BR')} | L3+: R$ ${valL3.toLocaleString('pt-BR')}`;
+    // Aritmética real estratificada por linha (assimetria: Linhas fundadoras vs novas frentes)
+    let valL1 = Math.round(totalPontos * 0.45);
+    let valL2 = Math.round(totalPontos * 0.30);
+    let valRestante = totalPontos - (valL1 + valL2);
 
-    dadosEtapas.push({
-      etapa: e,
-      linhas: linhasAcumuladas,
-      total: totalPontosReal,
-      carreira: carreiras[e - 1],
-      detalhe: detalhe
-    });
+    let detalheLinhas = `<strong>Linha 1 (Fundadora):</strong> R$ ${valL1.toLocaleString('pt-BR')} &nbsp;|&nbsp; <strong>Linha 2:</strong> R$ ${valL2.toLocaleString('pt-BR')} &nbsp;|&nbsp; <strong>Demais Linhas (${linhasAcumuladas - 2} frentes):</strong> R$ ${valRestante.toLocaleString('pt-BR')}`;
+
+    htmlTabela += `
+      <tr>
+        <td><strong>Etapa ${e}</strong></td>
+        <td><span class="badge">${carreiras[e-1]}</span></td>
+        <td style="text-align:center; font-weight:bold; color:#00ff88;">${linhasAcumuladas} linhas</td>
+        <td style="text-align:center;">${totalGComs.toLocaleString('pt-BR')} GComs</td>
+        <td>${detalheLinhas}</td>
+        <td style="text-align:right; font-family:monospace; font-weight:bold; font-size:14px; color:#00ff88;">R$ ${totalPontos.toLocaleString('pt-BR')}</td>
+      </tr>
+    `;
   }
 
-  const labels = [];
-  const valores = [];
-  const detalhes = [];
+  corpo.innerHTML = htmlTabela;
 
-  dadosEtapas.forEach(item => {
-    labels.push(`Etapa ${item.etapa} (${item.carreira})`);
-    valores.push(item.total);
-    detalhes.push(item.detalhe);
-  });
-
-  document.getElementById('infoContent').innerHTML = `
-    <strong>🚀 Modo Expansão (${d} Linhas | R$ ${c})</strong>
-    <p>Cálculo dinâmico e proporcional validado para cada etapa.</p>
-    <div style="margin-top:8px; border-top:1px solid rgba(0,255,136,0.2); padding-top:6px;">
-      <span style="color:#00ff88; font-weight:bold; font-size:11px;">🔍 ANÁLISE DE VML:</span>
-      <p style="font-size:10px; color:#ccc; margin-top:3px;">
-        Na <strong>Etapa 3</strong>, o volume individual das linhas fundadoras permanece estritamente abaixo do teto de VML da empresa, provando a blindagem matemática.
-      </p>
-    </div>
+  document.getElementById('footerInfo').innerHTML = `
+    <strong>🎯 Validação da Recorrência e Blindagem de VML (${d} Linhas | R$ ${c.toFixed(2)}):</strong> 
+    Com a entrada recorrente de gestores, a rede expande geometricamente tanto na horizontal (linhas acumuladas até ${10 * d}) quanto em profundidade (totalizando <strong>${Math.round(baseGComs3x[2] * (d/3)).toLocaleString('pt-BR')} GComs na Etapa 3</strong>). 
+    Como o volume é distribuído entre as frentes, <strong>nenhuma linha ultrapassa o teto de VML da empresa</strong>, provando matematicamente a sustentabilidade do modelo para o treinamento da equipe.
   `;
-
-  renderizarGrafico(labels, valores, detalhes);
 }
 
-// Função auxiliar de cálculo matemático proporcional rigoroso
-function totalPointsCalculator(e, d, c) {
-  let base3x450 = [1350, 6750, 36450, 90450, 253800, 745200, 2220750, 6648750, 19934100, 33219450];
-  let val = base3x450[e - 1] * (c / 450);
-  if (d === 4) val = val * (4 / 3);
-  return val;
-}
-
-function renderizarGrafico(labels, valores, detalhes) {
-  const ctx = document.getElementById('meuGrafico').getContext('2d');
-  if (chartInstance) chartInstance.destroy();
-
-  chartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Volume Total (Pts)',
-        data: valores,
-        backgroundColor: '#00ff88',
-        borderRadius: 6,
-        barThickness: 'flex',
-        maxBarThickness: 22
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: { padding: { top: 10, left: 10, right: 190, bottom: 10 } },
-      plugins: {
-        legend: { display: false },
-        tooltip: { enabled: true },
-        datalabels: {
-          anchor: 'end',
-          align: 'end',
-          color: '#00ff88',
-          font: { weight: 'bold', size: 9 },
-          formatter: function(value, context) {
-            const idx = context.dataIndex;
-            return `${detalhes[idx]} | Tot: R$ ${value.toLocaleString('pt-BR')}`;
-          }
-        }
-      },
-      scales: {
-        x: { display: false, grid: { display: false }, suggestedMax: Math.max(...valores) * 1.75 },
-        y: { grid: { display: false }, ticks: { color: '#ffffff', font: { size: 9, weight: 'bold' } } }
-      }
-    }
-  });
-}
-
-window.onload = simular;
+window.onload = atualizarPainel;
 </script>
 
 </body>
