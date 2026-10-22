@@ -4,158 +4,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CRC | Matriz Analítica Mestre de Treinamento</title>
-<meta name="description" content="Painel analítico CRC de crescimento recorrente de GComs e blindagem de VML.">
+<title>CRC | Mapeamento Aritmético Linha por Linha</title>
+<meta name="description" content="Engenharia de rede CRC: Cálculo individual de consumo para cada linha (L1 a L30).">
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
 *{ margin:0; padding:0; box-sizing:border-box; }
-html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#050505; color:white; overflow-x:hidden; }
-.app{ position:relative; width:100%; min-height:100dvh; display:flex; flex-direction:column; padding:16px; }
-.card{
-  position:relative; z-index:2; width:100%; max-width:1400px; margin: 0 auto;
-  background: rgba(18, 24, 38, 0.95); backdrop-filter: blur(16px);
-  border: 1px solid rgba(0,255,136,.3); border-radius:20px; padding:24px;
-  box-shadow: 0 12px 40px rgba(0,0,0,.6); display:flex; flex-direction:column;
-}
-.eyebrow{ font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color: rgba(0,255,136,.9); margin-bottom:4px; font-weight: bold; }
-.title{ font-size: clamp(18px, 2.5vw, 26px); line-height:1.2; margin-bottom:4px; font-weight:700; }
-.subtitle{ font-size: clamp(12px, 1.2vw, 14px); color: rgba(255,255,255,.7); margin-bottom:20px; }
-.sim-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin-bottom:24px; background: rgba(0,0,0,0.4); padding:16px; border-radius:14px; border: 1px solid rgba(255,255,255,0.06); }
-.sim-label{ display:block; font-size:11px; color:#aaa; margin-bottom:6px; text-transform:uppercase; font-weight:600; }
-.sim-select{ width:100%; background:#080808; border: 1px solid #333; border-radius:10px; padding:11px 14px; color:#00ff88; font-weight:bold; font-size:13px; outline:none; }
+html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#050706; color:white; overflow-x:hidden; }
+.app{ width:100%; min-height:100dvh; padding:20px; display:flex; justify-content:center; }
+.container-master{ width:100%; max-width:1400px; }
 
-/* TABELA MASTER DE ESPAÇO TOTAL */
-.table-container{ width:100%; overflow-x:auto; border-radius:12px; border: 1px solid rgba(255,255,255,0.08); }
-table{ width:100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-th{ background: #0b110e; color: #00ff88; padding: 14px 16px; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; border-bottom: 2px solid rgba(0,255,136,0.3); }
-td{ padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0; }
-tr:hover{ background: rgba(0,255,136,0.02); }
-.badge{ display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; background: rgba(0,255,136,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+/* HEADER E FILTROS */
+.header-box{ background: rgba(18, 24, 38, 0.95); border: 1px solid rgba(0,255,136,.3); border-radius:16px; padding:20px; margin-bottom:20px; }
+.eyebrow{ font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color: #00ff88; font-weight: bold; margin-bottom:4px; }
+.title{ font-size: clamp(18px, 2.5vw, 24px); font-weight:700; margin-bottom:4px; }
+.subtitle{ font-size: 13px; color: #94a3b8; margin-bottom:16px; }
 
-/* RODAPÉ EXPLICATIVO */
-.footer-info{ margin-top: 20px; background: rgba(0, 255, 136, 0.04); border: 1px dashed rgba(0, 255, 136, 0.3); border-radius: 12px; padding: 16px; font-size: 12px; color: #cbd5e1; line-height: 1.6; }
-.footer-info strong{ color: #00ff88; }
+.sim-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; background: rgba(0,0,0,0.5); padding:14px; border-radius:12px; border: 1px solid rgba(255,255,255,0.08); }
+.sim-label{ display:block; font-size:11px; color:#aaa; margin-bottom:4px; text-transform:uppercase; font-weight:600; }
+.sim-select{ width:100%; background:#0a0e0c; border: 1px solid #333; border-radius:8px; padding:10px; color:#00ff88; font-weight:bold; font-size:13px; outline:none; }
+
+/* ETAPAS CARDS */
+.etapa-card{ background: #0b110e; border: 1px solid rgba(255,255,255,0.08); border-radius:14px; padding:18px; margin-bottom:16px; transition: border 0.2s; }
+.etapa-card:hover{ border-color: rgba(0,255,136,0.4); }
+.etapa-header{ display:flex; justify-content:space-between; align-items:center; border-b border-gray-800; padding-bottom:12px; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
+
+/* GRID INDIVIDUAL DE LINHAS (L1, L2, L3...) */
+.linhas-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:10px; }
+.linha-item{ background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); border-radius:8px; padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between; }
+.linha-item.antiga{ border-left: 3px solid #00ff88; }
+.linha-item.nova{ border-left: 3px solid #38bdf8; }
+.linha-tag{ font-size:11px; font-weight:bold; color:#94a3b8; display:flex; justify-content:space-between; }
+.linha-tag span{ color:#00ff88; }
+.linha-val{ font-size:14px; font-weight:bold; color:#ffffff; font-family:monospace; margin-top:4px; }
 </style>
 </head>
 
 <body>
 
 <div class="app">
-  <div class="card">
-    <div class="eyebrow">CRC | Painel Mestre de Treinamento de Gestores</div>
-    <h1 class="title">Matriz Analítica de Crescimento Recorrente & Blindagem de VML</h1>
-    <p class="subtitle">Análise geométrica de expansão de GComs, linhas ativas e volume aritmético real por linha em largura total.</p>
+  <div class="container-master">
+    
+    <div class="header-box">
+      <div class="eyebrow">CRC | Painel de Alocação de Equipes & Diagnóstico de VML</div>
+      <h1 class="title">Mapa Aritmético Individual por Linha (L1 a L30)</h1>
+      <p class="subtitle">Identifique exatamente a produção de cada linha para saber onde direcionar novos cadastros do SCOUT.</p>
 
-    <!-- FILTROS -->
-    <div class="sim-grid">
-      <div>
-        <label class="sim-label">Novas Linhas / GComs Diretos por Etapa</label>
-        <select id="gestores" onchange="atualizarPainel()" class="sim-select">
-          <option value="3" selected>3 Novos Gestores / Etapa (Modo Expansão CRC - Matriz 3x3)</option>
-          <option value="4">4 Novos Gestores / Etapa (Modo Executivo - Matriz 4x4)</option>
-        </select>
+      <div class="sim-grid">
+        <div>
+          <label class="sim-label">Novas Linhas por Etapa</label>
+          <select id="gestores" onchange="calcularEExibir()" class="sim-select">
+            <option value="3" selected>3 Novas Linhas / Etapa (Matriz 3x3 - 30 Linhas na Etapa 10)</option>
+            <option value="4">4 Novas Linhas / Etapa (Matriz 4x4 - 40 Linhas na Etapa 10)</option>
+          </select>
+        </div>
+        <div>
+          <label class="sim-label">Consumo Mensal por GCom</label>
+          <select id="consumo" onchange="calcularEExibir()" class="sim-select">
+            <option value="300">R$ 300,00 por GCom</option>
+            <option value="450" selected>R$ 450,00 por GCom (Padrão Executivo)</option>
+            <option value="500">R$ 500,00 por GCom (Personalizado)</option>
+          </select>
+        </div>
       </div>
-      <div>
-        <label class="sim-label">Consumo Recorrente Mensal por GCom</label>
-        <select id="consumo" onchange="atualizarPainel()" class="sim-select">
-          <option value="300">R$ 300,00 por GCom</option>
-          <option value="450" selected>R$ 450,00 por GCom (Padrão Executivo)</option>
-          <option value="500">R$ 500,00 por GCom (Personalizado)</option>
-        </select>
-      </div>
     </div>
 
-    <!-- TABELA MASTER DE DADOS -->
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Etapa</th>
-            <th>Carreira Atingida</th>
-            <th style="text-align:center;">Linhas Acumuladas</th>
-            <th style="text-align:center;">Total GComs na Rede</th>
-            <th>Detalhamento do Consumo Aritmético por Linha</th>
-            <th style="text-align:right;">Volume Total da Etapa</th>
-          </tr>
-        </thead>
-        <tbody id="tabelaCorpo">
-          <!-- Injetado via JavaScript -->
-        </tbody>
-      </table>
-    </div>
+    <!-- ÁREA ONDE AS ETAPAS E SUAS LINHAS SERÃO INJETADAS -->
+    <div id="etapasContainer"></div>
 
-    <!-- RODAPÉ DE VALIDAÇÃO TÉCNICA -->
-    <div class="footer-info" id="footerInfo">
-      <!-- Injetado dinamicamente -->
-    </div>
   </div>
 </div>
 
 <script>
-const carreiras3x3 = [
+const carreirasMap = [
   "Executivo", "Topázio", "Diamante (Ametista)", "Jaspe", "Jade", 
   "Royal Black", "Dream Red", "Master Gold", "Master Gold", "Master Gold (Topo)"
 ];
 
-const carreiras4x4 = [
-  "Executivo", "Topázio", "Diamante", "Jaspe", "Jade", 
-  "Royal Black", "Dream Red", "Master Gold", "Master Gold", "Master Gold (Topo)"
-];
-
-function atualizarPainel() {
+function calcularEExibir() {
   const d = parseInt(document.getElementById('gestores').value);
   const c = parseFloat(document.getElementById('consumo').value);
-  
-  const corpo = document.getElementById('tabelaCorpo');
-  corpo.innerHTML = '';
-
-  let htmlTabela = '';
-  const carreiras = d === 3 ? carreiras3x3 : carreiras4x4;
-
-  // Base oficial de pontos para 3x450 ajustada geometricamente por GCom recorrente
-  const basePontos3x = [1350, 6750, 36450, 90450, 253800, 745200, 2220750, 6648750, 19934100, 33219450];
-  const baseGComs3x   = [3, 15, 54, 174, 537, 1620, 4860, 14580, 43740, 72900];
+  const container = document.getElementById('etapasContainer');
+  container.innerHTML = '';
 
   for (let e = 1; e <= 10; e++) {
-    let linhasAcumuladas = e * d;
-    let fator = c / 450;
-    
-    // Multiplicador geométrico de expansão recorrente
-    let totalGComs = Math.round(baseGComs3x[e-1] * (d / 3));
-    let totalPontos = Math.round(basePontos3x[e-1] * fator * (d / 3));
+    const totalLinhasEtapa = e * d;
+    let volumeTotalEtapa = 0;
+    let htmlLinhas = '';
 
-    // Aritmética real estratificada por linha (assimetria: Linhas fundadoras vs novas frentes)
-    let valL1 = Math.round(totalPontos * 0.45);
-    let valL2 = Math.round(totalPontos * 0.30);
-    let valRestante = totalPontos - (valL1 + valL2);
+    for (let l = 1; l <= totalLinhasEtapa; l++) {
+      // Determina em qual etapa a linha l foi aberta
+      const etapaAbertura = Math.floor((l - 1) / d) + 1;
+      const profundidade = (e - etapaAbertura) + 1;
+      
+      // Cálculo de pessoas na rede dessa linha específica
+      let pessoasNaLinha = 0;
+      if (d > 1) {
+        pessoasNaLinha = Math.round((Math.pow(d, profundidade) - 1) / (d - 1));
+      } else {
+        pessoasNaLinha = profundidade;
+      }
 
-    let detalheLinhas = `<strong>Linha 1 (Fundadora):</strong> R$ ${valL1.toLocaleString('pt-BR')} &nbsp;|&nbsp; <strong>Linha 2:</strong> R$ ${valL2.toLocaleString('pt-BR')} &nbsp;|&nbsp; <strong>Demais Linhas (${linhasAcumuladas - 2} frentes):</strong> R$ ${valRestante.toLocaleString('pt-BR')}`;
+      const volumeLinha = pessoasNaLinha * c;
+      volumeTotalEtapa += volumeLinha;
 
-    htmlTabela += `
-      <tr>
-        <td><strong>Etapa ${e}</strong></td>
-        <td><span class="badge">${carreiras[e-1]}</span></td>
-        <td style="text-align:center; font-weight:bold; color:#00ff88;">${linhasAcumuladas} linhas</td>
-        <td style="text-align:center;">${totalGComs.toLocaleString('pt-BR')} GComs</td>
-        <td>${detalheLinhas}</td>
-        <td style="text-align:right; font-family:monospace; font-weight:bold; font-size:14px; color:#00ff88;">R$ ${totalPontos.toLocaleString('pt-BR')}</td>
-      </tr>
+      const classeEstilo = etapaAbertura === 1 ? 'antiga' : 'nova';
+      
+      htmlLinhas += `
+        <div class="linha-item ${classeEstilo}">
+          <div class="linha-tag">
+            Linha ${l}
+            <span>P: ${profundidade} Nív</span>
+          </div>
+          <div class="linha-val">R$ ${volumeLinha.toLocaleString('pt-BR')}</div>
+        </div>
+      `;
+    }
+
+    const cardHtml = `
+      <div class="etapa-card">
+        <div class="etapa-header">
+          <div>
+            <span style="color:#00ff88; font-weight:bold; font-size:16px;">Etapa ${e}</span>
+            <span style="background:rgba(0,255,136,0.1); color:#00ff88; border:1px solid rgba(0,255,136,0.3); padding:3px 10px; border-radius:12px; font-size:11px; margin-left:10px; font-weight:bold;">
+              ${carreirasMap[e-1]}
+            </span>
+          </div>
+          <div style="text-align:right;">
+            <span style="color:#aaa; font-size:12px;">Total da Etapa (${totalLinhasEtapa} Linhas):</span>
+            <strong style="color:#00ff88; font-size:18px; font-family:monospace; margin-left:8px;">
+              R$ ${volumeTotalEtapa.toLocaleString('pt-BR')}
+            </strong>
+          </div>
+        </div>
+
+        <div style="font-size:11px; color:#aaa; margin-bottom:10px; font-weight:600; text-transform:uppercase;">
+          Detalhamento Individual de Volume por Linha:
+        </div>
+
+        <div class="linhas-grid">
+          ${htmlLinhas}
+        </div>
+      </div>
     `;
+
+    container.innerHTML += cardHtml;
   }
-
-  corpo.innerHTML = htmlTabela;
-
-  document.getElementById('footerInfo').innerHTML = `
-    <strong>🎯 Validação da Recorrência e Blindagem de VML (${d} Linhas | R$ ${c.toFixed(2)}):</strong> 
-    Com a entrada recorrente de gestores, a rede expande geometricamente tanto na horizontal (linhas acumuladas até ${10 * d}) quanto em profundidade (totalizando <strong>${Math.round(baseGComs3x[2] * (d/3)).toLocaleString('pt-BR')} GComs na Etapa 3</strong>). 
-    Como o volume é distribuído entre as frentes, <strong>nenhuma linha ultrapassa o teto de VML da empresa</strong>, provando matematicamente a sustentabilidade do modelo para o treinamento da equipe.
-  `;
 }
 
-window.onload = atualizarPainel;
+window.onload = calcularEExibir;
 </script>
 
 </body>
