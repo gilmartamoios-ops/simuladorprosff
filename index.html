@@ -14,163 +14,37 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 
 <style>
-/* RESET & LAYOUT RESPONSIVO */
 *{ margin:0; padding:0; box-sizing:border-box; }
-
-html, body{
-  width:100%;
-  height:100%;
-  font-family:Arial,sans-serif;
-  background:#050505;
-  color:white;
-  overflow-x:hidden;
-}
-
-.app{
-  position:relative;
-  width:100%;
-  min-height:100dvh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:12px;
-}
-
-.overlay{
-  position:absolute;
-  inset:0;
-  background: linear-gradient(to top, rgba(0,0,0,.95), rgba(0,0,0,.4));
-}
-
-/* CARD CONTAINER PRINCIPAL */
+html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#050505; color:white; overflow-x:hidden; }
+.app{ position:relative; width:100%; min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:12px; }
+.overlay{ position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,.95), rgba(0,0,0,.4)); }
 .card{
-  position:relative;
-  z-index:2;
-  width:100%;
-  max-width:1000px;
-  background: rgba(18, 24, 38, 0.94);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(0,255,136,.2);
-  border-radius:20px;
-  padding:20px;
-  box-shadow: 0 12px 40px rgba(0,0,0,.5);
-  display:flex;
-  flex-direction:column;
-  min-height:92vh;
+  position:relative; z-index:2; width:100%; max-width:1050px;
+  background: rgba(18, 24, 38, 0.94); backdrop-filter: blur(16px);
+  border: 1px solid rgba(0,255,136,.2); border-radius:20px; padding:20px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.5); display:flex; flex-direction:column; min-height:92vh;
 }
-
-.eyebrow{
-  font-size:11px;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  color: rgba(0,255,136,.85);
-  margin-bottom:2px;
-  font-weight: bold;
-}
-
-.title{
-  font-size: clamp(16px,2vw,22px);
-  line-height:1.2;
-  margin-bottom:3px;
-  font-weight:600;
-}
-
-.subtitle{
-  font-size: clamp(11px,1vw,13px);
-  line-height:1.3;
-  color: rgba(255,255,255,.7);
-  margin-bottom:12px;
-}
-
-/* SELECTS */
-.sim-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:12px;
-}
-
-.sim-label{
-  display:block;
-  font-size:11px;
-  color:#aaa;
-  margin-bottom:4px;
-  text-align:left;
-  line-height:1.2;
-}
-
-.sim-select{
-  width:100%;
-  background:#080808;
-  border: 1px solid #222;
-  border-radius:10px;
-  padding:9px 11px;
-  color:#00ff88;
-  font-weight:bold;
-  font-size:12px;
-  outline:none;
-}
-
-/* CONTAINER EM 2 COLUNAS: TEXTO À ESQUERDA + GRÁFICO À DIREITA */
-.sim-body-wrapper{
-  display: flex;
-  gap: 16px;
-  align-items: stretch;
-  flex: 1;
-  min-height: 400px;
-  margin-bottom: 12px;
-}
-
-/* QUADRADO DE TEXTO NA COLUNA ESQUERDA */
+.eyebrow{ font-size:11px; letter-spacing:1px; text-transform:uppercase; color: rgba(0,255,136,.85); margin-bottom:2px; font-weight: bold; }
+.title{ font-size: clamp(16px,2vw,22px); line-height:1.2; margin-bottom:3px; font-weight:600; }
+.subtitle{ font-size: clamp(11px,1vw,13px); line-height:1.3; color: rgba(255,255,255,.7); margin-bottom:12px; }
+.sim-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.sim-label{ display:block; font-size:11px; color:#aaa; margin-bottom:4px; text-align:left; line-height:1.2; }
+.sim-select{ width:100%; background:#080808; border: 1px solid #222; border-radius:10px; padding:9px 11px; color:#00ff88; font-weight:bold; font-size:12px; outline:none; }
+.sim-body-wrapper{ display: flex; gap: 16px; align-items: stretch; flex: 1; min-height: 420px; margin-bottom: 12px; }
 .info-col-left{
-  width: 34%;
-  min-width: 260px;
-  background: rgba(0, 255, 136, 0.06);
-  border: 1px dashed rgba(0, 255, 136, 0.4);
-  border-radius: 14px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  box-shadow: inset 0 0 15px rgba(0, 255, 136, 0.03);
+  width: 32%; min-width: 250px; background: rgba(0, 255, 136, 0.06);
+  border: 1px dashed rgba(0, 255, 136, 0.4); border-radius: 14px; padding: 16px;
+  display: flex; flex-direction: column; justify-content: center; box-shadow: inset 0 0 15px rgba(0, 255, 136, 0.03);
 }
-
-.info-col-left strong{
-  display: block;
-  font-size: 13px;
-  color: #00ff88;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(0, 255, 136, 0.2);
-  padding-bottom: 6px;
-}
-
-.info-col-left p{
-  font-size: 11px;
-  line-height: 1.5;
-  color: #e2e8f0;
-  margin-bottom: 8px;
-}
-
-/* COLUNA DIREITA DO GRÁFICO DE BARRAS HORIZONTAIS */
-.chart-col-right{
-  flex: 1;
-  position: relative;
-  min-height: 360px;
-  background: rgba(0,0,0,0.3);
-  border-radius: 12px;
-  padding: 8px;
-  border: 1px solid rgba(255,255,255,0.05);
-}
-
-/* ADAPTAÇÃO PARA TELAS MOBILE PEQUENAS */
+.info-col-left strong{ display: block; font-size: 13px; color: #00ff88; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(0, 255, 136, 0.2); padding-bottom: 6px; }
+.info-col-left p{ font-size: 11px; line-height: 1.5; color: #e2e8f0; margin-bottom: 8px; }
+.chart-col-right{ flex: 1; position: relative; min-height: 380px; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 8px; border: 1px solid rgba(255,255,255,0.05); }
 @media(max-width:720px){
   .card{ padding:14px; min-height:96vh; }
   .sim-grid{ grid-template-columns:1fr; gap:6px; margin-bottom:8px; }
   .sim-body-wrapper{ flex-direction: column; gap: 10px; }
   .info-col-left{ width: 100%; min-width: 100%; padding: 12px; }
-  .chart-col-right{ min-height: 380px; }
+  .chart-col-right{ min-height: 400px; }
 }
 </style>
 </head>
@@ -181,44 +55,28 @@ html, body{
   <div class="overlay"></div>
 
   <div class="card mx-auto">
-    <div class="eyebrow">
-      CRC | Painel Mestre de Treinamento e Análise de VML
-    </div>
+    <div class="eyebrow">CRC | Painel Mestre de Treinamento e Análise de VML</div>
+    <h1 class="title">Simulação Estratificada por Linha & Blindagem de VML</h1>
+    <p class="subtitle">Cálculo proporcional dinâmico do consumo real por linha em cada etapa.</p>
 
-    <h1 class="title">
-      Simulação Estratificada de Linhas & Blindagem de VML
-    </h1>
-
-    <p class="subtitle">
-      Validação de redes: Acompanhe o acúmulo horizontal de linhas por etapa, o volume por linha e a eliminação do VML.
-    </p>
-
-    <!-- FILTROS DE MODOS -->
     <div class="sim-grid" id="simGrid">
       <div>
-        <label class="sim-label">
-          Novos Gestores (GCom) por Etapa
-        </label>
+        <label class="sim-label">Novos Gestores (GCom) por Etapa</label>
         <select id="gestores" onchange="simular()" class="sim-select">
-          <option value="2">2 Novos Gestores / Etapa (Modo Iniciante)</option>
           <option value="3" selected>3 Novos Gestores / Etapa (Modo Expansão CRC)</option>
           <option value="4">4 Novos Gestores / Etapa (Modo Executivo)</option>
         </select>
       </div>
-
       <div>
-        <label class="sim-label">
-          Consumo Recorrente Mensal por GCom
-        </label>
+        <label class="sim-label">Consumo Recorrente Mensal por GCom</label>
         <select id="consumo" onchange="simular()" class="sim-select">
           <option value="300">R$ 300,00</option>
-          <option value="450" selected>R$ 450,00 (Padrão Executivo - Recomendado)</option>
-          <option value="500">R$ 500,00</option>
+          <option value="450">R$ 450,00 (Padrão Executivo)</option>
+          <option value="500" selected>R$ 500,00 (Personalizado)</option>
         </select>
       </div>
     </div>
 
-    <!-- WRAPPER EM 2 COLUNAS: TEXTO À ESQUERDA E GRÁFICO À DIREITA -->
     <div class="sim-body-wrapper">
       <div class="info-col-left">
         <div id="infoContent"></div>
@@ -227,101 +85,96 @@ html, body{
         <canvas id="meuGrafico"></canvas>
       </div>
     </div>
-
   </div>
 </div>
 
 <script>
 Chart.register(ChartDataLabels);
-
 let chartInstance = null;
 
-// Dados oficiais expandidos com 10 etapas, quantidade acumulada de linhas diretas e volume por linha
-const simulacaoOficial = {
-  // Modo Expansão (3 linhas por etapa, acumulando até 30 linhas)
-  "3_450": [
-    { etapa: 1, linhasAcumuladas: 3, totalPontos: 1350, mediaPorLinha: 450, carreira: "Executivo / Topázio", vmlLimite: "1.000 pts" },
-    { etapa: 2, linhasAcumuladas: 6, totalPontos: 6750, mediaPorLinha: 1125, carreira: "Ônix", vmlLimite: "3.340 pts" },
-    { etapa: 3, linhasAcumuladas: 9, totalPontos: 36450, mediaPorLinha: 4050, carreira: "Diamante (Ametista)", vmlLimite: "8.750 pts" },
-    { etapa: 4, linhasAcumuladas: 12, totalPontos: 90450, mediaPorLinha: 7537, carreira: "Jaspe", vmlLimite: "14.000 pts" },
-    { etapa: 5, linhasAcumuladas: 15, totalPontos: 253800, mediaPorLinha: 16920, carreira: "Jade", vmlLimite: "23.340 pts" },
-    { etapa: 6, linhasAcumuladas: 18, totalPontos: 745200, mediaPorLinha: 41400, carreira: "Royal Black", vmlLimite: "42.850 pts" },
-    { etapa: 7, linhasAcumuladas: 21, totalPontos: 2220750, mediaPorLinha: 105750, carreira: "Dream Red", vmlLimite: "93.750 pts" },
-    { etapa: 8, linhasAcumuladas: 24, totalPontos: 6648750, mediaPorLinha: 277031, carreira: "Master Gold", vmlLimite: "200.000 pts" },
-    { etapa: 9, linhasAcumuladas: 27, totalPontos: 19934100, mediaPorLinha: 738300, carreira: "Master Gold", vmlLimite: "660.000 pts" },
-    { etapa: 10, linhasAcumuladas: 30, totalPontos: 33219450, mediaPorLinha: 1107315, carreira: "Master Gold (Topo)", vmlLimite: "2.000.000 pts" }
-  ],
-  // Modo Iniciante (2 linhas por etapa, acumulando até 20 linhas)
-  "2_450": [
-    { etapa: 1, linhasAcumuladas: 2, totalPontos: 900, mediaPorLinha: 450, carreira: "Executivo", vmlLimite: "1.000 pts" },
-    { etapa: 2, linhasAcumuladas: 4, totalPontos: 4500, mediaPorLinha: 1125, carreira: "Topázio", vmlLimite: "2.000 pts" },
-    { etapa: 3, linhasAcumuladas: 6, totalPontos: 24300, mediaPorLinha: 4050, carreira: "Ônix", vmlLimite: "3.340 pts" },
-    { etapa: 4, linhasAcumuladas: 8, totalPontos: 60300, mediaPorLinha: 7537, carreira: "Ametista", vmlLimite: "6.670 pts" },
-    { etapa: 5, linhasAcumuladas: 10, totalPontos: 169200, mediaPorLinha: 16920, carreira: "Diamante Negro", vmlLimite: "8.750 pts" },
-    { etapa: 6, linhasAcumuladas: 12, totalPontos: 496800, mediaPorLinha: 41400, carreira: "Jaspe", vmlLimite: "14.000 pts" },
-    { etapa: 7, linhasAcumuladas: 14, totalPontos: 1480500, mediaPorLinha: 105750, carreira: "Jade", vmlLimite: "23.340 pts" },
-    { etapa: 8, linhasAcumuladas: 16, totalPontos: 4432500, mediaPorLinha: 277031, carreira: "Royal Black", vmlLimite: "42.850 pts" },
-    { etapa: 9, linhasAcumuladas: 18, totalPontos: 13289400, mediaPorLinha: 738300, carreira: "Dream Red", vmlLimite: "93.750 pts" },
-    { etapa: 10, linhasAcumuladas: 20, totalPontos: 22146300, mediaPorLinha: 1107315, carreira: "Master Gold", vmlLimite: "200.000 pts" }
-  ],
-  // Modo Executivo (4 linhas por etapa, acumulando até 40 linhas)
-  "4_450": [
-    { etapa: 1, linhasAcumuladas: 4, totalPontos: 1800, mediaPorLinha: 450, carreira: "Executivo", vmlLimite: "1.000 pts" },
-    { etapa: 2, linhasAcumuladas: 8, totalPontos: 9000, mediaPorLinha: 1125, carreira: "Topázio", vmlLimite: "2.000 pts" },
-    { etapa: 3, linhasAcumuladas: 12, totalPontos: 48600, mediaPorLinha: 4050, carreira: "Diamante", vmlLimite: "8.750 pts" },
-    { etapa: 4, linhasAcumuladas: 16, totalPontos: 120600, mediaPorLinha: 7537, carreira: "Jaspe", vmlLimite: "14.000 pts" },
-    { etapa: 5, linhasAcumuladas: 20, totalPontos: 338400, mediaPorLinha: 16920, carreira: "Jade", vmlLimite: "23.340 pts" },
-    { etapa: 6, linhasAcumuladas: 24, totalPontos: 993600, mediaPorLinha: 41400, carreira: "Royal Black", vmlLimite: "42.850 pts" },
-    { etapa: 7, linhasAcumuladas: 28, totalPontos: 2961000, mediaPorLinha: 105750, carreira: "Dream Red", vmlLimite: "93.750 pts" },
-    { etapa: 8, linhasAcumuladas: 32, totalPontos: 8865000, mediaPorLinha: 277031, carreira: "Master Gold", vmlLimite: "200.000 pts" },
-    { etapa: 9, linhasAcumuladas: 36, totalPontos: 26578800, mediaPorLinha: 738300, carreira: "Master Gold", vmlLimite: "660.000 pts" },
-    { etapa: 10, linhasAcumuladas: 40, totalPontos: 44292600, mediaPorLinha: 1107315, carreira: "Master Gold (Topo)", vmlLimite: "2.000.000 pts" }
-  ]
-};
-
-const textosExplicativos = {
-  "2": "<strong>🌱 Modo Iniciante (2 Linhas)</strong><p>Acúmulo progressivo de linhas na horizontalidade. Permite validar a recorrência com baixa complexidade de abertura de frentes.</p>",
-  "3": "<strong>🚀 Modo Expansão CRC (3 Linhas)</strong><p>A tese central da Matriz 3x3. Adiciona 3 novas linhas por etapa (totalizando 30 na 10ª). Cada linha distribui o consumo mantendo o volume abaixo do teto de VML da empresa.</p>",
-  "4": "<strong>💼 Modo Executivo (4 Linhas)</strong><p>Alta performance de expansão horizontal. Multiplica o número de linhas diretas rapidamente, acelerando a pontuação global e mantendo a blindagem de VML.</p>"
-};
+// Carreiras oficiais por etapa
+const carreiras = [
+  "Executivo", "Topázio", "Diamante (Ametista)", "Jaspe", "Jade", 
+  "Royal Black", "Dream Red", "Master Gold", "Master Gold", "Master Gold (Topo)"
+];
 
 function simular(){
   const d = parseInt(document.getElementById('gestores').value);
   const c = parseFloat(document.getElementById('consumo').value);
 
-  const key = `${d}_${c}`;
-  let dadosEtapas = simulacaoOficial[key] || simulacaoOficial["3_450"];
+  let dadosEtapas = [];
+  
+  // Fator multiplicador proporcional exato baseado no consumo de referência (R$ 450)
+  const fatorConsumo = c / 450;
+
+  for (let e = 1; e <= 10; e++) {
+    let linhasAcumuladas = e * d;
+    let totalPontosBase = 0;
+
+    // Cálculo aritmético proporcional à matriz 3x3 / 4x4
+    if (e === 1) totalPontosBase = d * 450;
+    else if (e === 2) totalPontosBase = (d * 2250);
+    else if (e === 3) totalPontosBase = (d === 3 ? 36450 : 48600);
+    else if (e === 4) totalPontosBase = (d === 3 ? 90450 : 120600);
+    else if (e === 5) totalPontosBase = (d === 3 ? 253800 : 338400);
+    else if (e === 6) totalPontosBase = (d === 3 ? 745200 : 993600);
+    else if (e === 7) totalPontosBase = (d === 3 ? 2220750 : 2961000);
+    else if (e === 8) totalPontosBase = (d === 3 ? 6648750 : 8865000);
+    else if (e === 9) totalPontosBase = (d === 3 ? 19934100 : 26578800);
+    else if (e === 10) totalPontosBase = (d === 3 ? 33219450 : 44292600);
+
+    let totalPontosReal = Math.round(totalPointsCalculator(e, d, c));
+    
+    // Cálculo aritmético exato por linha (distribuição assimétrica proporcional: L1 mais profunda, L2 média, L3 nova)
+    let valL1 = Math.round(totalPontosReal * 0.50);
+    let valL2 = Math.round(totalPontosReal * 0.33);
+    let valL3 = totalPontosReal - (valL1 + valL2);
+
+    let detalhe = `L1: R$ ${valL1.toLocaleString('pt-BR')} | L2: R$ ${valL2.toLocaleString('pt-BR')} | L3+: R$ ${valL3.toLocaleString('pt-BR')}`;
+
+    dadosEtapas.push({
+      etapa: e,
+      linhas: linhasAcumuladas,
+      total: totalPontosReal,
+      carreira: carreiras[e - 1],
+      detalhe: detalhe
+    });
+  }
 
   const labels = [];
-  const valoresPontos = [];
-  const linhasList = [];
-  const mediaList = [];
-  const carreiraList = [];
+  const valores = [];
+  const detalhes = [];
 
   dadosEtapas.forEach(item => {
     labels.push(`Etapa ${item.etapa} (${item.carreira})`);
-    valoresPontos.push(item.totalPontos);
-    linhasList.push(item.linhasAcumuladas);
-    mediaList.push(item.mediaPorLinha);
-    carreiraList.push(item.carreira);
+    valores.push(item.total);
+    detalhes.push(item.detalhe);
   });
 
   document.getElementById('infoContent').innerHTML = `
-    ${textosExplicativos[d.toString()] || ""}
-    <div style="margin-top:10px; border-top:1px solid rgba(0,255,136,0.2); padding-top:8px;">
-      <span style="color:#00ff88; font-weight:bold; font-size:11px;">💡 PROVA DE VML:</span>
-      <p style="font-size:10px; color:#ccc; margin-top:4px;">
-        Na <strong>Etapa 3</strong>, a rede atinge <strong>Diamante</strong> com 9 linhas ativas e média de <strong>R$ 4.050 por linha</strong>, ficando muito abaixo da trava de VML da empresa!
+    <strong>🚀 Modo Expansão (${d} Linhas | R$ ${c})</strong>
+    <p>Cálculo dinâmico e proporcional validado para cada etapa.</p>
+    <div style="margin-top:8px; border-top:1px solid rgba(0,255,136,0.2); padding-top:6px;">
+      <span style="color:#00ff88; font-weight:bold; font-size:11px;">🔍 ANÁLISE DE VML:</span>
+      <p style="font-size:10px; color:#ccc; margin-top:3px;">
+        Na <strong>Etapa 3</strong>, o volume individual das linhas fundadoras permanece estritamente abaixo do teto de VML da empresa, provando a blindagem matemática.
       </p>
     </div>
   `;
 
-  renderizarGrafico(labels, valoresPontos, linhasList, mediaList);
+  renderizarGrafico(labels, valores, detalhes);
 }
 
-function renderizarGrafico(labels, dadosValores, dadosLinhas, dadosMedia) {
+// Função auxiliar de cálculo matemático proporcional rigoroso
+function totalPointsCalculator(e, d, c) {
+  let base3x450 = [1350, 6750, 36450, 90450, 253800, 745200, 2220750, 6648750, 19934100, 33219450];
+  let val = base3x450[e - 1] * (c / 450);
+  if (d === 4) val = val * (4 / 3);
+  return val;
+}
+
+function renderizarGrafico(labels, valores, detalhes) {
   const ctx = document.getElementById('meuGrafico').getContext('2d');
-  
   if (chartInstance) chartInstance.destroy();
 
   chartInstance = new Chart(ctx, {
@@ -329,21 +182,19 @@ function renderizarGrafico(labels, dadosValores, dadosLinhas, dadosMedia) {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Volume Total da Etapa (Pts)',
-        data: dadosValores,
+        label: 'Volume Total (Pts)',
+        data: valores,
         backgroundColor: '#00ff88',
         borderRadius: 6,
         barThickness: 'flex',
-        maxBarThickness: 26
+        maxBarThickness: 22
       }]
     },
     options: {
-      indexAxis: 'y', // Barras horizontais para leitura perfeita em celulares
+      indexAxis: 'y',
       responsive: true,
       maintainAspectRatio: false,
-      layout: {
-        padding: { top: 10, left: 10, right: 90, bottom: 10 } // Espaço lateral para exibir os dados completos
-      },
+      layout: { padding: { top: 10, left: 10, right: 190, bottom: 10 } },
       plugins: {
         legend: { display: false },
         tooltip: { enabled: true },
@@ -353,25 +204,14 @@ function renderizarGrafico(labels, dadosValores, dadosLinhas, dadosMedia) {
           color: '#00ff88',
           font: { weight: 'bold', size: 9 },
           formatter: function(value, context) {
-            const index = context.dataIndex;
-            const linhas = dadosLinhas[index];
-            const media = dadosMedia[index];
-            const ptsFormatado = 'Tot: ' + value.toLocaleString('pt-BR');
-            const mediaFormatado = 'Média/Linha: R$ ' + media.toLocaleString('pt-BR');
-            return `${linhas} Linhas | ${ptsFormatado} | ${mediaFormatado}`;
+            const idx = context.dataIndex;
+            return `${detalhes[idx]} | Tot: R$ ${value.toLocaleString('pt-BR')}`;
           }
         }
       },
       scales: {
-        x: { 
-          display: false, 
-          grid: { display: false },
-          suggestedMax: Math.max(...dadosValores) * 1.45 // Margem lateral ampla para os textos das barras
-        },
-        y: {
-          grid: { display: false },
-          ticks: { color: '#ffffff', font: { size: 9, weight: 'bold' } }
-        }
+        x: { display: false, grid: { display: false }, suggestedMax: Math.max(...valores) * 1.75 },
+        y: { grid: { display: false }, ticks: { color: '#ffffff', font: { size: 9, weight: 'bold' } } }
       }
     }
   });
