@@ -4,8 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CRC | Simulador de Comunidades</title>
-<meta name="description" content="Simulador CRC de construção de comunidade e relacionamento de consumo.">
+<title>CRC | Painel Mestre de Treinamento e Simulação</title>
+<meta name="description" content="Simulador CRC de engenharia de rede, duplicação de GCom e blindagem contra VML.">
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -47,13 +47,13 @@ html, body{
   position:relative;
   z-index:2;
   width:100%;
-  max-width:880px;
+  max-width:960px;
   background: rgba(18, 24, 38, 0.94);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,.08);
+  border: 1px solid rgba(0,255,136,.2);
   border-radius:20px;
   padding:20px;
-  box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  box-shadow: 0 12px 40px rgba(0,0,0,.5);
   display:flex;
   flex-direction:column;
   min-height:92vh;
@@ -111,13 +111,13 @@ html, body{
   outline:none;
 }
 
-/* CONTAINER EM 2 COLUNAS: TEXTO À ESQUERDA + GRÁFICO À DIREITA SEM TREPAR */
+/* CONTAINER EM 2 COLUNAS: TEXTO À ESQUERDA + GRÁFICO À DIREITA */
 .sim-body-wrapper{
   display: flex;
   gap: 16px;
   align-items: stretch;
   flex: 1;
-  min-height: 320px;
+  min-height: 380px;
   margin-bottom: 12px;
 }
 
@@ -152,11 +152,15 @@ html, body{
   color: #e2e8f0;
 }
 
-/* COLUNA DIREITA DO GRÁFICO (ÁREA TOTALMENTE LIVRE) */
+/* COLUNA DIREITA DO GRÁFICO DE BARRAS HORIZONTAIS */
 .chart-col-right{
   flex: 1;
   position: relative;
-  min-height: 280px;
+  min-height: 340px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
 .retorno-scout{
@@ -191,7 +195,7 @@ html, body{
   .sim-grid{ grid-template-columns:1fr; gap:6px; margin-bottom:8px; }
   .sim-body-wrapper{ flex-direction: column; gap: 10px; }
   .info-col-left{ width: 100%; min-width: 100%; padding: 12px; }
-  .chart-col-right{ min-height: 240px; }
+  .chart-col-right{ min-height: 340px; }
 }
 </style>
 </head>
@@ -203,33 +207,33 @@ html, body{
 
   <div class="card mx-auto">
     <div class="eyebrow">
-      CRC | Modelo de Comunidades
+      CRC | Painel Mestre de Treinamento de Gestores
     </div>
 
     <h1 class="title">
-      Simulação de Expansão da Comunidade
+      Simulação Estratificada de Comunidade & Blindagem VML
     </h1>
 
     <p class="subtitle">
-      Projeção baseada em GCom - gestores de comunidade e consumo recorrente.
+      Treinamento de equipes: Duplicação recorrente, expansão de linhas via SCOUT e aproveitamento máximo de bônus.
     </p>
 
-    <!-- FILTROS COM OS 3 MODELOS -->
+    <!-- FILTROS DE MODOS -->
     <div class="sim-grid" id="simGrid">
       <div>
         <label class="sim-label">
-          Novos GCom (Gestores de Comunidade) por etapa
+          Novos Gestores (GCom) por Etapa
         </label>
         <select id="gestores" onchange="simular()" class="sim-select">
           <option value="2">2 Novos Gestores / Etapa (Modo Iniciante)</option>
-          <option value="3">3 Novos Gestores / Etapa (Modo Expansão)</option>
-          <option value="4" selected>4 Novos Gestores / Etapa (Modo Executivo)</option>
+          <option value="3" selected>3 Novos Gestores / Etapa (Modo Expansão CRC)</option>
+          <option value="4">4 Novos Gestores / Etapa (Modo Executivo)</option>
         </select>
       </div>
 
       <div>
         <label class="sim-label">
-          Consumo Recorrente Mensal da Comunidade
+          Consumo Recorrente Mensal por GCom
         </label>
         <select id="consumo" onchange="simular()" class="sim-select">
           <option value="300">R$ 300,00</option>
@@ -239,7 +243,7 @@ html, body{
       </div>
     </div>
 
-    <!-- WRAPPER EM 2 COLUNAS: TEXTO NA ESQUERDA E GRÁFICO TOTALMENTE LIVRE NA DIREITA -->
+    <!-- WRAPPER EM 2 COLUNAS: TEXTO À ESQUERDA E GRÁFICO À DIREITA -->
     <div class="sim-body-wrapper">
       <div class="info-col-left">
         <div id="infoContent"></div>
@@ -250,8 +254,8 @@ html, body{
     </div>
 
     <div class="retorno-scout">
-      <a href="https://crc-scout.vercel.app/?etapa=quiz">
-        Continuar no SCOUT
+      <a href="https://crc-scout.vercel.app/" target="_blank">
+        Acessar Plataforma Principal SCOUT
         <span>→</span>
       </a>
     </div>
@@ -291,9 +295,9 @@ const simulacaoOficial = {
 };
 
 const textosExplicativos = {
-  "2": "<strong>🌱 Modo Iniciante (2 Gestores)</strong><p>Entrada com alta facilidade de duplicação. A partir da 3ª etapa, o bônus cobre integralmente o cartão de crédito da compra inicial e gera lucro líquido crescente com baixo esforço.</p>",
-  "3": "<strong>🚀 Modo Expansão (3 Gestores)</strong><p>Equilíbrio ideal entre duplicação e velocidade. Acelera os ganhos de Unilevel e alcança a faixa de R$ 3.900 a R$ 13.000 já entre a 3ª e 4ª etapa.</p>",
-  "4": "<strong>💼 Modo Executivo (4 Gestores)</strong><p>O padrão de máxima performance. Otimiza a pontuação por linha (VML), garante Bônus Evolution e PLR acelerados, atingindo graduações de elite (Jaspe e Jade) com solidez.</p>"
+  "2": "<strong>🌱 Modo Iniciante (2 Linhas)</strong><p>Ideal para novos líderes. Baixa complexidade de abertura de frentes, garantindo estabilidade e teste prático do consumo recorrente.</p>",
+  "3": "<strong>🚀 Modo Expansão CRC (3 Linhas)</strong><p>A tese central da Matriz 3x3. Garante a simetria perfeita entre as frentes, diluindo o VML e atingindo patamares de Ametista e Diamante com folga.</p>",
+  "4": "<strong>💼 Modo Executivo (4 Linhas)</strong><p>Alta performance de duplicação. Acelera os ganhos de Unilevel e PLR, exigindo maturidade na gestão de comunidade e acompanhamento contínuo.</p>"
 };
 
 function simular(){
@@ -335,7 +339,7 @@ function simular(){
   const gcomsList = [];
 
   dadosEtapas.forEach(item => {
-    labels.push(`${item.etapa}ª Etapa\n(${item.plano})`);
+    labels.push(`${item.etapa}ª Etapa (${item.plano})`);
     valoresGanhos.push(item.total);
     gcomsList.push(item.gcom);
   });
@@ -359,14 +363,16 @@ function renderizarGrafico(labels, dadosValores, dadosGcom) {
         data: dadosValores,
         backgroundColor: '#00ff88',
         borderRadius: 6,
-        barThickness: 'flex'
+        barThickness: 'flex',
+        maxBarThickness: 32
       }]
     },
     options: {
+      indexAxis: 'y', // <--- Transforma as barras em horizontais (perfeito para mobile)
       responsive: true,
       maintainAspectRatio: false,
       layout: {
-        padding: { top: 35, left: 5, right: 5, bottom: 5 }
+        padding: { top: 10, left: 10, right: 75, bottom: 10 } // Espaço extra à direita para os números não cortarem
       },
       plugins: {
         legend: { display: false },
@@ -374,21 +380,23 @@ function renderizarGrafico(labels, dadosValores, dadosGcom) {
         datalabels: {
           anchor: 'end',
           align: 'end',
-          offset: 2,
           color: '#00ff88',
           font: { weight: 'bold', size: 10 },
           formatter: function(value, context) {
             const index = context.dataIndex;
             const gcomCount = dadosGcom[index];
             const valorFormatado = 'R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            return `${gcomCount} GCom\n${valorFormatado}`;
-          },
-          textAlign: 'center'
+            return `${gcomCount} GCom | ${valorFormatado}`;
+          }
         }
       },
       scales: {
-        y: { display: false, grid: { display: false } },
-        x: {
+        x: { 
+          display: false, 
+          grid: { display: false },
+          suggestedMax: Math.max(...dadosValores) * 1.35 // Margem lateral garantida
+        },
+        y: {
           grid: { display: false },
           ticks: { color: '#ffffff', font: { size: 10, weight: 'bold' } }
         }
