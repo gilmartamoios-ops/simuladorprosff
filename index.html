@@ -4,8 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CRC | Painel Mestre de Treinamento e Simulação</title>
-<meta name="description" content="Simulador CRC de engenharia de rede, duplicação de GCom e blindagem contra VML.">
+<title>CRC | Painel Mestre de Treinamento e Análise de VML</title>
+<meta name="description" content="Simulador CRC de engenharia de rede, acúmulo de linhas e blindagem contra VML.">
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -47,7 +47,7 @@ html, body{
   position:relative;
   z-index:2;
   width:100%;
-  max-width:960px;
+  max-width:1000px;
   background: rgba(18, 24, 38, 0.94);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(0,255,136,.2);
@@ -117,14 +117,14 @@ html, body{
   gap: 16px;
   align-items: stretch;
   flex: 1;
-  min-height: 380px;
+  min-height: 400px;
   margin-bottom: 12px;
 }
 
 /* QUADRADO DE TEXTO NA COLUNA ESQUERDA */
 .info-col-left{
-  width: 32%;
-  min-width: 240px;
+  width: 34%;
+  min-width: 260px;
   background: rgba(0, 255, 136, 0.06);
   border: 1px dashed rgba(0, 255, 136, 0.4);
   border-radius: 14px;
@@ -150,43 +150,18 @@ html, body{
   font-size: 11px;
   line-height: 1.5;
   color: #e2e8f0;
+  margin-bottom: 8px;
 }
 
 /* COLUNA DIREITA DO GRÁFICO DE BARRAS HORIZONTAIS */
 .chart-col-right{
   flex: 1;
   position: relative;
-  min-height: 340px;
+  min-height: 360px;
   background: rgba(0,0,0,0.3);
   border-radius: 12px;
   padding: 8px;
   border: 1px solid rgba(255,255,255,0.05);
-}
-
-.retorno-scout{
-  display:flex;
-  justify-content:center;
-  padding-top:10px;
-  border-top:1px solid rgba(255,255,255,0.06);
-  flex-shrink:0;
-}
-
-.retorno-scout a{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  width:100%;
-  max-width:420px;
-  min-height:40px;
-  padding:8px 16px;
-  border:1px solid rgba(0,255,136,.35);
-  border-radius:10px;
-  background:rgba(0,255,136,.08);
-  color:#00ff88;
-  text-decoration:none;
-  font-size:13px;
-  font-weight:700;
 }
 
 /* ADAPTAÇÃO PARA TELAS MOBILE PEQUENAS */
@@ -195,7 +170,7 @@ html, body{
   .sim-grid{ grid-template-columns:1fr; gap:6px; margin-bottom:8px; }
   .sim-body-wrapper{ flex-direction: column; gap: 10px; }
   .info-col-left{ width: 100%; min-width: 100%; padding: 12px; }
-  .chart-col-right{ min-height: 340px; }
+  .chart-col-right{ min-height: 380px; }
 }
 </style>
 </head>
@@ -207,15 +182,15 @@ html, body{
 
   <div class="card mx-auto">
     <div class="eyebrow">
-      CRC | Painel Mestre de Treinamento de Gestores
+      CRC | Painel Mestre de Treinamento e Análise de VML
     </div>
 
     <h1 class="title">
-      Simulação Estratificada de Comunidade & Blindagem VML
+      Simulação Estratificada de Linhas & Blindagem de VML
     </h1>
 
     <p class="subtitle">
-      Treinamento de equipes: Duplicação recorrente, expansão de linhas via SCOUT e aproveitamento máximo de bônus.
+      Validação de redes: Acompanhe o acúmulo horizontal de linhas por etapa, o volume por linha e a eliminação do VML.
     </p>
 
     <!-- FILTROS DE MODOS -->
@@ -253,12 +228,6 @@ html, body{
       </div>
     </div>
 
-    <div class="retorno-scout">
-      <a href="https://crc-scout.vercel.app/" target="_blank">
-        Acessar Plataforma Principal SCOUT
-        <span>→</span>
-      </a>
-    </div>
   </div>
 </div>
 
@@ -267,37 +236,53 @@ Chart.register(ChartDataLabels);
 
 let chartInstance = null;
 
+// Dados oficiais expandidos com 10 etapas, quantidade acumulada de linhas diretas e volume por linha
 const simulacaoOficial = {
-  // Modo Executivo (4x450)
-  "4_450": [
-    { etapa: 1, gcom: 4, plano: "Executivo", total: 360.00 },
-    { etapa: 2, gcom: 24, plano: "Ônix", total: 1186.00 },
-    { etapa: 3, gcom: 108, plano: "Jaspe", total: 7038.00 },
-    { etapa: 4, gcom: 448, plano: "Jade", total: 21240.00 },
-    { etapa: 5, gcom: 1812, plano: "Dream Red", total: 68094.00 }
-  ],
-  // Modo Expansão (3x450)
+  // Modo Expansão (3 linhas por etapa, acumulando até 30 linhas)
   "3_450": [
-    { etapa: 1, gcom: 3, plano: "Executivo", total: 270.00 },
-    { etapa: 2, gcom: 15, plano: "Topázio", total: 634.50 },
-    { etapa: 3, gcom: 54, plano: "Ametista", total: 3915.00 },
-    { etapa: 4, gcom: 174, plano: "Diamante Negro", total: 13392.00 },
-    { etapa: 5, gcom: 537, plano: "Jaspe", total: 41094.00 }
+    { etapa: 1, linhasAcumuladas: 3, totalPontos: 1350, mediaPorLinha: 450, carreira: "Executivo / Topázio", vmlLimite: "1.000 pts" },
+    { etapa: 2, linhasAcumuladas: 6, totalPontos: 6750, mediaPorLinha: 1125, carreira: "Ônix", vmlLimite: "3.340 pts" },
+    { etapa: 3, linhasAcumuladas: 9, totalPontos: 36450, mediaPorLinha: 4050, carreira: "Diamante (Ametista)", vmlLimite: "8.750 pts" },
+    { etapa: 4, linhasAcumuladas: 12, totalPontos: 90450, mediaPorLinha: 7537, carreira: "Jaspe", vmlLimite: "14.000 pts" },
+    { etapa: 5, linhasAcumuladas: 15, totalPontos: 253800, mediaPorLinha: 16920, carreira: "Jade", vmlLimite: "23.340 pts" },
+    { etapa: 6, linhasAcumuladas: 18, totalPontos: 745200, mediaPorLinha: 41400, carreira: "Royal Black", vmlLimite: "42.850 pts" },
+    { etapa: 7, linhasAcumuladas: 21, totalPontos: 2220750, mediaPorLinha: 105750, carreira: "Dream Red", vmlLimite: "93.750 pts" },
+    { etapa: 8, linhasAcumuladas: 24, totalPontos: 6648750, mediaPorLinha: 277031, carreira: "Master Gold", vmlLimite: "200.000 pts" },
+    { etapa: 9, linhasAcumuladas: 27, totalPontos: 19934100, mediaPorLinha: 738300, carreira: "Master Gold", vmlLimite: "660.000 pts" },
+    { etapa: 10, linhasAcumuladas: 30, totalPontos: 33219450, mediaPorLinha: 1107315, carreira: "Master Gold (Topo)", vmlLimite: "2.000.000 pts" }
   ],
-  // Modo Iniciante (2x450)
+  // Modo Iniciante (2 linhas por etapa, acumulando até 20 linhas)
   "2_450": [
-    { etapa: 1, gcom: 2, plano: "Executivo", total: 180.00 },
-    { etapa: 2, gcom: 8, plano: "Topázio", total: 378.00 },
-    { etapa: 3, gcom: 22, plano: "Ônix", total: 1310.00 },
-    { etapa: 4, gcom: 52, plano: "Ametista", total: 2710.00 },
-    { etapa: 5, gcom: 114, plano: "Diamante Negro", total: 6552.00 }
+    { etapa: 1, linhasAcumuladas: 2, totalPontos: 900, mediaPorLinha: 450, carreira: "Executivo", vmlLimite: "1.000 pts" },
+    { etapa: 2, linhasAcumuladas: 4, totalPontos: 4500, mediaPorLinha: 1125, carreira: "Topázio", vmlLimite: "2.000 pts" },
+    { etapa: 3, linhasAcumuladas: 6, totalPontos: 24300, mediaPorLinha: 4050, carreira: "Ônix", vmlLimite: "3.340 pts" },
+    { etapa: 4, linhasAcumuladas: 8, totalPontos: 60300, mediaPorLinha: 7537, carreira: "Ametista", vmlLimite: "6.670 pts" },
+    { etapa: 5, linhasAcumuladas: 10, totalPontos: 169200, mediaPorLinha: 16920, carreira: "Diamante Negro", vmlLimite: "8.750 pts" },
+    { etapa: 6, linhasAcumuladas: 12, totalPontos: 496800, mediaPorLinha: 41400, carreira: "Jaspe", vmlLimite: "14.000 pts" },
+    { etapa: 7, linhasAcumuladas: 14, totalPontos: 1480500, mediaPorLinha: 105750, carreira: "Jade", vmlLimite: "23.340 pts" },
+    { etapa: 8, linhasAcumuladas: 16, totalPontos: 4432500, mediaPorLinha: 277031, carreira: "Royal Black", vmlLimite: "42.850 pts" },
+    { etapa: 9, linhasAcumuladas: 18, totalPontos: 13289400, mediaPorLinha: 738300, carreira: "Dream Red", vmlLimite: "93.750 pts" },
+    { etapa: 10, linhasAcumuladas: 20, totalPontos: 22146300, mediaPorLinha: 1107315, carreira: "Master Gold", vmlLimite: "200.000 pts" }
+  ],
+  // Modo Executivo (4 linhas por etapa, acumulando até 40 linhas)
+  "4_450": [
+    { etapa: 1, linhasAcumuladas: 4, totalPontos: 1800, mediaPorLinha: 450, carreira: "Executivo", vmlLimite: "1.000 pts" },
+    { etapa: 2, linhasAcumuladas: 8, totalPontos: 9000, mediaPorLinha: 1125, carreira: "Topázio", vmlLimite: "2.000 pts" },
+    { etapa: 3, linhasAcumuladas: 12, totalPontos: 48600, mediaPorLinha: 4050, carreira: "Diamante", vmlLimite: "8.750 pts" },
+    { etapa: 4, linhasAcumuladas: 16, totalPontos: 120600, mediaPorLinha: 7537, carreira: "Jaspe", vmlLimite: "14.000 pts" },
+    { etapa: 5, linhasAcumuladas: 20, totalPontos: 338400, mediaPorLinha: 16920, carreira: "Jade", vmlLimite: "23.340 pts" },
+    { etapa: 6, linhasAcumuladas: 24, totalPontos: 993600, mediaPorLinha: 41400, carreira: "Royal Black", vmlLimite: "42.850 pts" },
+    { etapa: 7, linhasAcumuladas: 28, totalPontos: 2961000, mediaPorLinha: 105750, carreira: "Dream Red", vmlLimite: "93.750 pts" },
+    { etapa: 8, linhasAcumuladas: 32, totalPontos: 8865000, mediaPorLinha: 277031, carreira: "Master Gold", vmlLimite: "200.000 pts" },
+    { etapa: 9, linhasAcumuladas: 36, totalPontos: 26578800, mediaPorLinha: 738300, carreira: "Master Gold", vmlLimite: "660.000 pts" },
+    { etapa: 10, linhasAcumuladas: 40, totalPontos: 44292600, mediaPorLinha: 1107315, carreira: "Master Gold (Topo)", vmlLimite: "2.000.000 pts" }
   ]
 };
 
 const textosExplicativos = {
-  "2": "<strong>🌱 Modo Iniciante (2 Linhas)</strong><p>Ideal para novos líderes. Baixa complexidade de abertura de frentes, garantindo estabilidade e teste prático do consumo recorrente.</p>",
-  "3": "<strong>🚀 Modo Expansão CRC (3 Linhas)</strong><p>A tese central da Matriz 3x3. Garante a simetria perfeita entre as frentes, diluindo o VML e atingindo patamares de Ametista e Diamante com folga.</p>",
-  "4": "<strong>💼 Modo Executivo (4 Linhas)</strong><p>Alta performance de duplicação. Acelera os ganhos de Unilevel e PLR, exigindo maturidade na gestão de comunidade e acompanhamento contínuo.</p>"
+  "2": "<strong>🌱 Modo Iniciante (2 Linhas)</strong><p>Acúmulo progressivo de linhas na horizontalidade. Permite validar a recorrência com baixa complexidade de abertura de frentes.</p>",
+  "3": "<strong>🚀 Modo Expansão CRC (3 Linhas)</strong><p>A tese central da Matriz 3x3. Adiciona 3 novas linhas por etapa (totalizando 30 na 10ª). Cada linha distribui o consumo mantendo o volume abaixo do teto de VML da empresa.</p>",
+  "4": "<strong>💼 Modo Executivo (4 Linhas)</strong><p>Alta performance de expansão horizontal. Multiplica o número de linhas diretas rapidamente, acelerando a pontuação global e mantendo a blindagem de VML.</p>"
 };
 
 function simular(){
@@ -305,51 +290,36 @@ function simular(){
   const c = parseFloat(document.getElementById('consumo').value);
 
   const key = `${d}_${c}`;
-  let dadosEtapas = [];
-
-  if(simulacaoOficial[key]){
-    dadosEtapas = simulacaoOficial[key];
-  } else {
-    let gcomAcum = 0;
-    for(let e = 1; e <= 5; e++){
-      let novos = Math.pow(d, e);
-      gcomAcum += novos;
-      
-      let fator = (c / 450) * (d / 4);
-      let baseTotal = 0;
-      if(e === 1) baseTotal = 360 * fator;
-      else if(e === 2) baseTotal = 1186 * fator;
-      else if(e === 3) baseTotal = 7038 * fator;
-      else if(e === 4) baseTotal = 21240 * fator;
-      else if(e === 5) baseTotal = 68094 * fator;
-
-      let planoNome = e === 1 ? "Executivo" : (e === 2 ? "Topázio" : (e === 3 ? "Jaspe" : (e === 4 ? "Jade" : "Dream Red")));
-
-      dadosEtapas.push({
-        etapa: e,
-        gcom: gcomAcum,
-        plano: planoNome,
-        total: baseTotal
-      });
-    }
-  }
+  let dadosEtapas = simulacaoOficial[key] || simulacaoOficial["3_450"];
 
   const labels = [];
-  const valoresGanhos = [];
-  const gcomsList = [];
+  const valoresPontos = [];
+  const linhasList = [];
+  const mediaList = [];
+  const carreiraList = [];
 
   dadosEtapas.forEach(item => {
-    labels.push(`${item.etapa}ª Etapa (${item.plano})`);
-    valoresGanhos.push(item.total);
-    gcomsList.push(item.gcom);
+    labels.push(`Etapa ${item.etapa} (${item.carreira})`);
+    valoresPontos.push(item.totalPontos);
+    linhasList.push(item.linhasAcumuladas);
+    mediaList.push(item.mediaPorLinha);
+    carreiraList.push(item.carreira);
   });
 
-  document.getElementById('infoContent').innerHTML = textosExplicativos[d.toString()] || "";
+  document.getElementById('infoContent').innerHTML = `
+    ${textosExplicativos[d.toString()] || ""}
+    <div style="margin-top:10px; border-top:1px solid rgba(0,255,136,0.2); padding-top:8px;">
+      <span style="color:#00ff88; font-weight:bold; font-size:11px;">💡 PROVA DE VML:</span>
+      <p style="font-size:10px; color:#ccc; margin-top:4px;">
+        Na <strong>Etapa 3</strong>, a rede atinge <strong>Diamante</strong> com 9 linhas ativas e média de <strong>R$ 4.050 por linha</strong>, ficando muito abaixo da trava de VML da empresa!
+      </p>
+    </div>
+  `;
 
-  renderizarGrafico(labels, valoresGanhos, gcomsList);
+  renderizarGrafico(labels, valoresPontos, linhasList, mediaList);
 }
 
-function renderizarGrafico(labels, dadosValores, dadosGcom) {
+function renderizarGrafico(labels, dadosValores, dadosLinhas, dadosMedia) {
   const ctx = document.getElementById('meuGrafico').getContext('2d');
   
   if (chartInstance) chartInstance.destroy();
@@ -359,20 +329,20 @@ function renderizarGrafico(labels, dadosValores, dadosGcom) {
     data: {
       labels: labels,
       datasets: [{
-        label: 'Ganhos (R$)',
+        label: 'Volume Total da Etapa (Pts)',
         data: dadosValores,
         backgroundColor: '#00ff88',
         borderRadius: 6,
         barThickness: 'flex',
-        maxBarThickness: 32
+        maxBarThickness: 26
       }]
     },
     options: {
-      indexAxis: 'y', // <--- Transforma as barras em horizontais (perfeito para mobile)
+      indexAxis: 'y', // Barras horizontais para leitura perfeita em celulares
       responsive: true,
       maintainAspectRatio: false,
       layout: {
-        padding: { top: 10, left: 10, right: 75, bottom: 10 } // Espaço extra à direita para os números não cortarem
+        padding: { top: 10, left: 10, right: 90, bottom: 10 } // Espaço lateral para exibir os dados completos
       },
       plugins: {
         legend: { display: false },
@@ -381,12 +351,14 @@ function renderizarGrafico(labels, dadosValores, dadosGcom) {
           anchor: 'end',
           align: 'end',
           color: '#00ff88',
-          font: { weight: 'bold', size: 10 },
+          font: { weight: 'bold', size: 9 },
           formatter: function(value, context) {
             const index = context.dataIndex;
-            const gcomCount = dadosGcom[index];
-            const valorFormatado = 'R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            return `${gcomCount} GCom | ${valorFormatado}`;
+            const linhas = dadosLinhas[index];
+            const media = dadosMedia[index];
+            const ptsFormatado = 'Tot: ' + value.toLocaleString('pt-BR');
+            const mediaFormatado = 'Média/Linha: R$ ' + media.toLocaleString('pt-BR');
+            return `${linhas} Linhas | ${ptsFormatado} | ${mediaFormatado}`;
           }
         }
       },
@@ -394,11 +366,11 @@ function renderizarGrafico(labels, dadosValores, dadosGcom) {
         x: { 
           display: false, 
           grid: { display: false },
-          suggestedMax: Math.max(...dadosValores) * 1.35 // Margem lateral garantida
+          suggestedMax: Math.max(...dadosValores) * 1.45 // Margem lateral ampla para os textos das barras
         },
         y: {
           grid: { display: false },
-          ticks: { color: '#ffffff', font: { size: 10, weight: 'bold' } }
+          ticks: { color: '#ffffff', font: { size: 9, weight: 'bold' } }
         }
       }
     }
