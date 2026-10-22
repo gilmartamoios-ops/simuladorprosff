@@ -43,7 +43,7 @@ html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#0
 /* CARDS DAS ETAPAS */
 .etapa-card{ background: #0b110e; border: 1px solid rgba(255,255,255,0.08); border-radius:14px; padding:18px; margin-bottom:16px; }
 .etapa-card:hover{ border-color: rgba(0,255,136,0.4); }
-.etapa-header{ display:flex; justify-content:space-between; align-items:center; border-b border-gray-800; padding-bottom:12px; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
+.etapa-header{ display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom:12px; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
 
 /* GRID INDIVIDUAL DE LINHAS */
 .linhas-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); gap:10px; }
@@ -79,8 +79,8 @@ html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#0
         <div>
           <label class="sim-label">Consumo Recorrente Mensal da Comunidade</label>
           <select id="consumo" onchange="calcularEExibir()" class="sim-select">
-            <option value="300">R$ 300,00</option>
-            <option value="450" selected>R$ 450,00 (Padrão Executivo - Recomendado)</option>
+            <option value="300" selected>R$ 300,00</option>
+            <option value="450">R$ 450,00 (Padrão Executivo - Recomendado)</option>
             <option value="500">R$ 500,00</option>
           </select>
         </div>
@@ -104,9 +104,10 @@ const carreirasMap4x4 = [
   "Royal Black", "Master Gold", "Master Gold", "Master Gold", "Master Gold (Topo)"
 ];
 
-const gcomsAcumulados3x = [3, 15, 54, 174, 537, 1620, 4860, 14580, 43740, 72900];
-const gcomsAcumulados4x = [4, 24, 108, 448, 1812, 7272, 29116, 116496, 466020, 815544];
-const gcomsAcumulados2x = [2, 8, 22, 52, 114, 240, 500, 1020, 2080, 4200];
+// Bases oficiais de Pontos Totais da Planilha do Gilmar (para base 450)
+const base450_3x = [1350, 6750, 36450, 90450, 253800, 745200, 2220750, 6648750, 19934100, 33219450];
+const base450_4x = [1800, 10800, 77400, 230400, 844200, 3301200, 13131000, 52452000, 157356000, 262260000];
+const base450_2x = [900, 4500, 24300, 60300, 169200, 496800, 1480500, 4432500, 13289400, 22146300];
 
 function calcularEExibir() {
   const d = parseInt(document.getElementById('gestores').value);
@@ -115,42 +116,51 @@ function calcularEExibir() {
   container.innerHTML = '';
 
   const carreiras = d === 4 ? carreirasMap4x4 : carreirasMap3x3;
-  const listaGcomsBase = d === 4 ? gcomsAcumulados4x : (d === 3 ? gcomsAcumulados3x : gcomsAcumulados2x);
+  const baseEscolhida = d === 4 ? base450_4x : (d === 3 ? base450_3x : base450_2x);
 
   for (let e = 1; e <= 10; e++) {
     const totalLinhasEtapa = e * d;
-    let volumeTotalEtapaCalculado = 0;
-    let htmlLinhas = '';
+    
+    // Cálculo exato do total da etapa proporcional ao consumo escolhido (c / 450)
+    const totalPontosEtapaOficial = Math.round(baseEscolhida[e-1] * (c / 450));
+
+    // Distribuição ponderada exata por profundidade geométrica entre as linhas da etapa
+    let pesosLinhas = [];
+    let somaPesos = 0;
 
     for (let l = 1; l <= totalLinhasEtapa; l++) {
       const etapaAbertura = Math.floor((l - 1) / d) + 1;
       const profundidade = (e - etapaAbertura) + 1;
-      
-      let pessoasNaLinha = 0;
-      if (d > 1) {
-        pessoasNaLinha = Math.round((Math.pow(d, profundidade) - 1) / (d - 1));
+      const peso = Math.pow(d, profundidade);
+      pesosLinhas.push({ linha: l, profundidade: profundidade, peso: peso, etapaAbertura: etapaAbertura });
+      somaPesos += peso;
+    }
+
+    let htmlLinhas = '';
+    let somaVerificacao = 0;
+
+    pesosLinhas.forEach((item, idx) => {
+      let volumeLinha = 0;
+      if (idx === pesosLinhas.length - 1) {
+        // Ajuste de centavos na última linha para garantir igualdade exata com o total da etapa
+        volumeLinha = totalPontosEtapaOficial - somaVerificacao;
       } else {
-        pessoasNaLinha = profundidade;
+        volumeLinha = Math.round(totalPontosEtapaOficial * (item.peso / somaPesos));
+        somaVerificacao += volumeLinha;
       }
 
-      const volumeLinha = pessoasNaLinha * c;
-      volumeTotalEtapaCalculado += volumeLinha;
+      const classeEstilo = item.etapaAbertura === 1 ? 'antiga' : 'nova';
 
-      const classeEstilo = etapaAbertura === 1 ? 'antiga' : 'nova';
-      
       htmlLinhas += `
         <div class="linha-item ${classeEstilo}">
           <div class="linha-tag">
-            Linha ${l}
-            <span>P: ${profundidade} Nív</span>
+            Linha ${item.linha}
+            <span>P: ${item.profundidade} Nív</span>
           </div>
           <div class="linha-val">R$ ${volumeLinha.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
         </div>
       `;
-    }
-
-    const gcomTotalEtapa = listaGcomsBase[e-1];
-    const totalConsumoExato = gcomTotalEtapa * c;
+    });
 
     const cardHtml = `
       <div class="etapa-card">
@@ -160,14 +170,11 @@ function calcularEExibir() {
             <span style="background:rgba(0,255,136,0.1); color:#00ff88; border:1px solid rgba(0,255,136,0.3); padding:3px 10px; border-radius:12px; font-size:11px; margin-left:10px; font-weight:bold;">
               ${carreiras[e-1]}
             </span>
-            <span style="color:#aaa; font-size:12px; margin-left:12px;">
-              (${gcomTotalEtapa.toLocaleString('pt-BR')} GComs Totais na Rede)
-            </span>
           </div>
           <div style="text-align:right;">
-            <span style="color:#aaa; font-size:12px;">Consumo Total da Etapa (${totalLinhasEtapa} Linhas):</span>
+            <span style="color:#aaa; font-size:12px;">Total Oficial da Etapa (${totalLinhasEtapa} Linhas):</span>
             <strong style="color:#00ff88; font-size:18px; font-family:monospace; margin-left:8px;">
-              R$ ${totalConsumoExato.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+              R$ ${totalPontosEtapaOficial.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
             </strong>
           </div>
         </div>
