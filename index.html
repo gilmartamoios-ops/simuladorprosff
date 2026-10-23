@@ -46,13 +46,14 @@ html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#0
 .etapa-header{ display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom:12px; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
 
 /* GRID INDIVIDUAL DE LINHAS */
-.linhas-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); gap:10px; }
+.linhas-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap:10px; }
 .linha-item{ background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); border-radius:8px; padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between; }
 .linha-item.antiga{ border-left: 3px solid #00ff88; }
 .linha-item.nova{ border-left: 3px solid #38bdf8; }
 .linha-tag{ font-size:11px; font-weight:bold; color:#94a3b8; display:flex; justify-content:space-between; }
 .linha-tag span{ color:#00ff88; }
-.linha-val{ font-size:14px; font-weight:bold; color:#ffffff; font-family:monospace; margin-top:4px; }
+.linha-sub{ font-size:11px; color:#aaa; margin-top:2px; }
+.linha-val{ font-size:14px; font-weight:bold; color:#ffffff; font-family:monospace; margin-top:6px; }
 </style>
 </head>
 
@@ -71,9 +72,9 @@ html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#0
         <div>
           <label class="sim-label">Novas Linhas por Etapa</label>
           <select id="gestores" onchange="calcularEExibir()" class="sim-select">
-            <option value="2">2 Novos Gestores / Etapa (Modo Iniciante)</option>
-            <option value="3" selected>3 Novos Gestores / Etapa (Modo Expansão CRC)</option>
-            <option value="4">4 Novos Gestores / Etapa (Modo Executivo)</option>
+            <option value="2">2 Novos Gestores / Etapa (Modo 2x2)</option>
+            <option value="3" selected>3 Novos Gestores / Etapa (Modo Expansão CRC 3x3)</option>
+            <option value="4">4 Novos Gestores / Etapa (Modo Executivo 4x4)</option>
           </select>
         </div>
         <div>
@@ -94,20 +95,25 @@ html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#0
 </div>
 
 <script>
-const carreirasMap3x3 = [
-  "Executivo", "Topázio", "Diamante (Ametista)", "Jaspe", "Jade", 
-  "Royal Black", "Dream Red", "Master Gold", "Master Gold", "Master Gold (Topo)"
+const carreirasMap = [
+  "Executivo", "Topázio", "Ônix", "Ametista", "Diamante Negro", 
+  "Jaspe", "Jade", "Royal Black", "Dream Red", "Master Gold"
 ];
 
-const carreirasMap4x4 = [
-  "Executivo", "Ônix", "Jaspe", "Jade", "Dream Red", 
-  "Royal Black", "Master Gold", "Master Gold", "Master Gold", "Master Gold (Topo)"
-];
-
-// Mapeamento Exato da Coluna BL (GCom Total) da sua Planilha Oficial
+// Mapeamento Oficial da Coluna BL (GCom Total Acumulado) da Planilha por Etapa
 const gcomsOficiais_4x = [4, 24, 108, 448, 1812, 7272, 29116, 116496, 466020, 815544];
 const gcomsOficiais_3x = [3, 15, 54, 174, 537, 1629, 4908, 14748, 44271, 73794];
 const gcomsOficiais_2x = [2, 8, 22, 52, 114, 240, 500, 1020, 2080, 4200];
+
+// Função Aritmética para calcular o total de pessoas de 1 linha em função da profundidade acumulada
+function calcularPessoasPorLinha(d, profundidade) {
+  if (profundidade <= 0) return 0;
+  let pessoas = 0;
+  for (let k = 0; k < profundidade; k++) {
+    pessoas += Math.pow(d, k);
+  }
+  return pessoas;
+}
 
 function calcularEExibir() {
   const d = parseInt(document.getElementById('gestores').value);
@@ -115,41 +121,37 @@ function calcularEExibir() {
   const container = document.getElementById('etapasContainer');
   container.innerHTML = '';
 
-  const carreiras = d === 4 ? carreirasMap4x4 : carreirasMap3x3;
   const listaGcomsBase = d === 4 ? gcomsOficiais_4x : (d === 3 ? gcomsOficiais_3x : gcomsOficiais_2x);
 
   for (let e = 1; e <= 10; e++) {
     const totalLinhasEtapa = e * d;
-    const gcomTotalEtapa = listaGcomsBase[e - 1];
-    
-    // Total Oficial da Célula BO da Planilha: GCom Total x Consumo Unitário
-    const totalConsumoEtapaOficial = gcomTotalEtapa * c;
+    const gcomTotalEtapaOficial = listaGcomsBase[e - 1];
+    const totalConsumoEtapaOficial = gcomTotalEtapaOficial * c;
 
-    // Cálculo das profundidades e pesos geométricos de cada linha
-    let pesosLinhas = [];
-    let somaPesos = 0;
+    let detalheLinhas = [];
+    let somaGcomLinhas = 0;
 
     for (let l = 1; l <= totalLinhasEtapa; l++) {
       const etapaAbertura = Math.floor((l - 1) / d) + 1;
       const profundidade = (e - etapaAbertura) + 1;
-      const peso = Math.pow(d, profundidade);
-      pesosLinhas.push({ linha: l, profundidade: profundidade, peso: peso, etapaAbertura: etapaAbertura });
-      somaPesos += peso;
+      
+      // Cálculo do tamanho da linha na árvore matricial
+      const gcomLinha = calcularPessoasPorLinha(d, profundidade);
+      detalheLinhas.push({
+        linha: l,
+        etapaAbertura: etapaAbertura,
+        profundidade: profundidade,
+        gcomLinha: gcomLinha
+      });
+      somaGcomLinhas += gcomLinha;
     }
 
     let htmlLinhas = '';
-    let somaVerificacao = 0;
 
-    pesosLinhas.forEach((item, idx) => {
-      let volumeLinha = 0;
-      if (idx === pesosLinhas.length - 1) {
-        // Ajuste de fechamento exato para bater 100% com o total da etapa sem arredondamentos incorretos
-        volumeLinha = totalConsumoEtapaOficial - somaVerificacao;
-      } else {
-        volumeLinha = Math.round(totalConsumoEtapaOficial * (item.peso / somaPesos));
-        somaVerificacao += volumeLinha;
-      }
-
+    detalheLinhas.forEach((item) => {
+      // Proporção de produção exata com base nos GComs da linha
+      const proporcao = somaGcomLinhas > 0 ? (item.gcomLinha / somaGcomLinhas) : 0;
+      const volumeLinha = totalConsumoEtapaOficial * proporcao;
       const classeEstilo = item.etapaAbertura === 1 ? 'antiga' : 'nova';
 
       htmlLinhas += `
@@ -158,7 +160,8 @@ function calcularEExibir() {
             Linha ${item.linha}
             <span>P: ${item.profundidade} Nív</span>
           </div>
-          <div class="linha-val">R$ ${volumeLinha.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+          <div class="linha-sub">${item.gcomLinha.toLocaleString('pt-BR')} GComs</div>
+          <div class="linha-val">R$ ${volumeLinha.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
         </div>
       `;
     });
@@ -172,13 +175,13 @@ function calcularEExibir() {
               ${carreiras[e-1]}
             </span>
             <span style="color:#aaa; font-size:12px; margin-left:12px;">
-              (${gcomTotalEtapa.toLocaleString('pt-BR')} GComs Totais)
+              (${gcomTotalEtapaOficial.toLocaleString('pt-BR')} GComs Totais)
             </span>
           </div>
           <div style="text-align:right;">
             <span style="color:#aaa; font-size:12px;">Total Oficial da Etapa (${totalLinhasEtapa} Linhas):</span>
             <strong style="color:#00ff88; font-size:18px; font-family:monospace; margin-left:8px;">
-              R$ ${totalConsumoEtapaOficial.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+              R$ ${totalConsumoEtapaOficial.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </strong>
           </div>
         </div>
