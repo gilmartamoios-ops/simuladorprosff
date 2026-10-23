@@ -4,8 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CRC | Painel Mestre de Alocação e VML</title>
-<meta name="description" content="Engenharia de rede CRC: Mapeamento individual de consumo por linha e blindagem de VML.">
+<title>CRC | Painel Mestre de Alocação e VML (Pontos)</title>
+<meta name="description" content="Engenharia de rede CRC: Mapeamento individual de pontos por linha.">
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -16,13 +16,12 @@ html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#0
 .app{ width:100%; min-height:100dvh; padding:20px; display:flex; justify-content:center; }
 .container-master{ width:100%; max-width:1400px; }
 
-/* HEADER E SELETORES IDENTICOS AO SCOUT */
+/* HEADER E SELETORES */
 .header-box{ background: rgba(18, 24, 38, 0.95); border: 1px solid rgba(0,255,136,.3); border-radius:16px; padding:20px; margin-bottom:20px; }
 .eyebrow{ font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color: #00ff88; font-weight: bold; margin-bottom:4px; }
 .title{ font-size: clamp(18px, 2.5vw, 24px); font-weight:700; margin-bottom:4px; }
 .subtitle{ font-size: 13px; color: #94a3b8; margin-bottom:16px; }
 
-/* ESTILIZAÇÃO PADRÃO DAS CAIXAS DE SELEÇÃO (SCOUT) */
 .sim-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; background: rgba(0,0,0,0.5); padding:14px; border-radius:12px; border: 1px solid rgba(255,255,255,0.08); }
 .sim-label{ display:block; font-size:11px; color:#aaa; margin-bottom:6px; text-transform:uppercase; font-weight:bold; letter-spacing:0.5px; }
 .sim-select{ 
@@ -64,10 +63,10 @@ html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#0
     
     <div class="header-box">
       <div class="eyebrow">CRC | PAINEL DE ALOCAÇÃO DE EQUIPES & DIAGNÓSTICO DE VML</div>
-      <h1 class="title">Mapa Aritmético Individual por Linha</h1>
-      <p class="subtitle">Identifique exatamente a produção de cada linha para saber onde direcionar novos cadastros do SCOUT.</p>
+      <h1 class="title">Mapa Aritmético Individual por Linha (Em Pontos)</h1>
+      <p class="subtitle">Identifique exatamente a produção de pontos de cada linha para direcionar novos cadastros do SCOUT.</p>
 
-      <!-- CAIXAS DE DIÁLOGO / SELETORES PADRÃO SCOUT -->
+      <!-- CAIXAS DE SELEÇÃO -->
       <div class="sim-grid">
         <div>
           <label class="sim-label">Novas Linhas por Etapa</label>
@@ -78,11 +77,11 @@ html, body{ width:100%; height:100%; font-family:Arial,sans-serif; background:#0
           </select>
         </div>
         <div>
-          <label class="sim-label">Consumo Recorrente Mensal da Comunidade</label>
+          <label class="sim-label">Pontuação Recorrente Mensal por Membro</label>
           <select id="consumo" onchange="calcularEExibir()" class="sim-select">
-            <option value="300">R$ 300,00</option>
-            <option value="450">R$ 450,00 (Padrão Executivo - Recomendado)</option>
-            <option value="500" selected>R$ 500,00</option>
+            <option value="300" selected>300 Pontos</option>
+            <option value="450">450 Pontos (Padrão Executivo)</option>
+            <option value="500">500 Pontos</option>
           </select>
         </div>
       </div>
@@ -115,7 +114,7 @@ function calcularPessoasPorLinha(d, profundidade) {
 
 function calcularEExibir() {
   const d = parseInt(document.getElementById('gestores').value);
-  const c = parseFloat(document.getElementById('consumo').value);
+  const pontosUnitarios = parseInt(document.getElementById('consumo').value);
   const container = document.getElementById('etapasContainer');
   if (!container) return;
   container.innerHTML = '';
@@ -125,7 +124,7 @@ function calcularEExibir() {
   for (let e = 1; e <= 10; e++) {
     const totalLinhasEtapa = e * d;
     const gcomTotalEtapaOficial = listaGcomsBase[e - 1];
-    const totalConsumoEtapaOficial = gcomTotalEtapaOficial * c;
+    const totalPontosEtapaOficial = gcomTotalEtapaOficial * pontosUnitarios;
 
     let detalheLinhas = [];
     let somaGcomLinhas = 0;
@@ -148,7 +147,8 @@ function calcularEExibir() {
 
     detalheLinhas.forEach((item) => {
       const proporcao = somaGcomLinhas > 0 ? (item.gcomLinha / somaGcomLinhas) : 0;
-      const volumeLinha = totalConsumoEtapaOficial * proporcao;
+      // Arredondando para número inteiro exato de pontos
+      const pontosLinha = Math.round(totalPontosEtapaOficial * proporcao);
       const classeEstilo = item.etapaAbertura === 1 ? 'antiga' : 'nova';
 
       htmlLinhas += `
@@ -158,7 +158,7 @@ function calcularEExibir() {
             <span>P: ${item.profundidade} Nív</span>
           </div>
           <div class="linha-sub">${item.gcomLinha.toLocaleString('pt-BR')} GComs</div>
-          <div class="linha-val">R$ ${volumeLinha.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+          <div class="linha-val">${pontosLinha.toLocaleString('pt-BR')} Pts</div>
         </div>
       `;
     });
@@ -176,15 +176,15 @@ function calcularEExibir() {
             </span>
           </div>
           <div style="text-align:right;">
-            <span style="color:#aaa; font-size:12px;">Total Oficial da Etapa (${totalLinhasEtapa} Linhas):</span>
+            <span style="color:#aaa; font-size:12px;">Total de Pontos da Etapa (${totalLinhasEtapa} Linhas):</span>
             <strong style="color:#00ff88; font-size:18px; font-family:monospace; margin-left:8px;">
-              R$ ${totalConsumoEtapaOficial.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+              ${totalPontosEtapaOficial.toLocaleString('pt-BR')} Pts
             </strong>
           </div>
         </div>
 
         <div style="font-size:11px; color:#aaa; margin-bottom:10px; font-weight:600; text-transform:uppercase;">
-          Detalhamento Individual de Volume por Linha:
+          Detalhamento Individual de Pontos por Linha:
         </div>
 
         <div class="linhas-grid">
@@ -197,7 +197,6 @@ function calcularEExibir() {
   }
 }
 
-// Execução segura e imediata para ambiente dinâmico
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', calcularEExibir);
 } else {
